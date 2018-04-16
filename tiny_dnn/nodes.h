@@ -20,6 +20,10 @@
 #include "tiny_dnn/optimizers/optimizer.h"
 #include "tiny_dnn/util/util.h"
 
+// Korol
+#include <unistd.h>
+#include "sys/sysinfo.h"
+
 namespace cereal {
 
 template <typename Archive>
@@ -40,9 +44,29 @@ void load(Archive &ar, std::vector<std::shared_ptr<tiny_dnn::layer>> &v) {
   cereal::size_type size;
   ar(cereal::make_size_tag(size));
 
+  #ifdef PRINT_DEBUG
+    printf("[nodes/load] Filling layers from ar\n");
+  #endif
+
   for (size_t i = 0; i < size; i++) {
+    #ifdef PRINT_DEBUG
+      printf("[nodes/load] Looping over layers : %d\n", i);
+    #endif
     v.emplace_back(tiny_dnn::layer::load_layer(ar));
+
+    #ifdef PRINT_DEBUG
+      struct sysinfo memInfo;
+      sysinfo (&memInfo);
+      long long virtualMemUsed = memInfo.totalram - memInfo.freeram;
+      virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
+      virtualMemUsed *= memInfo.mem_unit;
+      long long physMemUsed = memInfo.totalram - memInfo.freeram;
+      physMemUsed *= memInfo.mem_unit;
+      printf("[nodes/load] VIRTUAL MEM AVAIL %lld\n", virtualMemUsed);
+      printf("[nodes/load] PHYSICAL MEM AVAIL %lld\n", physMemUsed);
+    #endif
   }
+
 #else
   throw tiny_dnn::nn_error("TinyDNN was not built with Serialization support");
 #endif  // CNN_NO_SERIALIZATION
@@ -294,6 +318,10 @@ class sequential : public nodes {
 
     nodes_.front()->set_in_data({reordered_data[0]});
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[sequential/forward] Calling node forward\n");
+    #endif
     for (auto l : nodes_) {
       l->forward();
     }
@@ -599,11 +627,21 @@ void nodes::save_model(OutputArchive &oa) const {
 
 template <typename InputArchive>
 void nodes::load_model(InputArchive &ia) {
+  #ifdef PRINT_DEBUG
+    printf("[nodes/load_model] Loading InputArchive to nodes\n");
+  #endif
+
 #ifndef CNN_NO_SERIALIZATION
   own_nodes_.clear();
   nodes_.clear();
 
+  #ifdef PRINT_DEBUG
+    printf("[nodes/load_model] Calling make_nvp\n");
+  #endif
   ia(cereal::make_nvp("nodes", own_nodes_));
+  #ifdef PRINT_DEBUG
+    printf("[nodes/load_model] Returning from make_nvp\n");
+  #endif
 
   for (auto &n : own_nodes_) {
     nodes_.push_back(&*n);
@@ -612,6 +650,9 @@ void nodes::load_model(InputArchive &ia) {
   if (typeid(*this) == typeid(sequential)) {
     dynamic_cast<sequential *>(this)->load_connections(ia);
   } else {
+    #ifdef PRINT_DEBUG
+      printf("[nodes/load_model] Loading Graph connections\n");
+    #endif
     dynamic_cast<graph *>(this)->load_connections(ia);
   }
 #else

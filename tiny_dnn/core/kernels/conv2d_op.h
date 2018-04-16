@@ -37,6 +37,11 @@ class Conv2dOp : public core::OpKernel {
 
     const core::backend_t engine = context.engine();
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[Conv2dOp/compute] Inside convolutional kernel\n");
+    #endif
+
     if (engine == core::backend_t::internal) {
       kernels::conv2d_op_internal(in_data, W[0], bias[0], out_data, params,
                                   context.parallelize());

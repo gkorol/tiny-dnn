@@ -257,6 +257,10 @@ class convolutional_layer : public layer {
    **/
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[convolutional_layer/forward_propagation] Inside CONV layer forward prop\n");
+    #endif
     // apply padding to the input tensor
     padding_op_.copy_and_pad_input(*in_data[0], cws_.prev_out_padded_);
 
@@ -270,6 +274,11 @@ class convolutional_layer : public layer {
     auto ctx = OpKernelContext(in_data_, out_data);
     ctx.setParallelize(layer::parallelize());
     ctx.setEngine(layer::engine());
+
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[convolutional_layer/forward_propagation] Calling convolutional kernel\n");
+    #endif
 
     // launch convolutional kernel
     kernel_fwd_->compute(ctx);

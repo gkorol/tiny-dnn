@@ -606,11 +606,17 @@ class network {
             content_type what  = content_type::weights_and_model,
             file_format format = file_format::binary) {
 #ifndef CNN_NO_SERIALIZATION
+    #ifdef PRINT_DEBUG
+      printf("[network/load] Calling ifstream\n");
+    #endif
     std::ifstream ifs(filename.c_str(), std::ios::binary | std::ios::in);
     if (ifs.fail() || ifs.bad()) throw nn_error("failed to open:" + filename);
 
     switch (format) {
       case file_format::binary: {
+        #ifdef PRINT_DEBUG
+          printf("[network/load] Calling Cereal Binary input\n");
+        #endif
         cereal::BinaryInputArchive bi(ifs);
         from_archive(bi, what);
       } break;
@@ -696,7 +702,7 @@ class network {
   * @deprecated use load_weights instead.
   **/
   void fast_load(const char *filepath) {
-    FILE *stream = fopen(filepath, "r");
+    FILE *stream = fopen(filepath, "rb");
     std::vector<float_t> data;
     double temp;
     while (fscanf(stream, "%lf", &temp) > 0) data.push_back(float_t(temp));
@@ -721,13 +727,28 @@ class network {
   template <typename InputArchive>
   void from_archive(InputArchive &ar,
                     content_type what = content_type::weights_and_model) {
+    #ifdef PRINT_DEBUG
+      printf("[network/from_archive] Calling load_model\n");
+    #endif
     if (what == content_type::model ||
         what == content_type::weights_and_model) {
+      #ifdef PRINT_DEBUG
+        printf("[network/from_archive] Loading model\n");
+      #endif
       net_.load_model(ar);
+      #ifdef PRINT_DEBUG
+        printf("[network/from_archive] Loaded model\n");
+      #endif
     }
     if (what == content_type::weights ||
         what == content_type::weights_and_model) {
+      #ifdef PRINT_DEBUG
+        printf("[network/from_archive] Loading weights\n");
+      #endif
       net_.load_weights(ar);
+      #ifdef PRINT_DEBUG
+        printf("[network/from_archive] Loaded weights\n");
+      #endif
     }
   }
 
@@ -865,6 +886,10 @@ class network {
   }
 
   std::vector<tensor_t> fprop(const std::vector<tensor_t> &in) {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[Network/fprop] Calling forward method\n");
+    #endif
     return net_.forward(in);
   }
 

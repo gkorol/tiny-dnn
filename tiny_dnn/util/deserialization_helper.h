@@ -43,6 +43,10 @@ class deserialization_helper {
   std::shared_ptr<layer> load(const std::string &layer_name, InputArchive &ar) {
     check_if_enabled();
 
+    #ifdef PRINT_DEBUG
+      printf("[deserialization_helper/load] Returning shared_ptr<load>\n");
+    #endif
+
     if (loaders_.find(layer_name) == loaders_.end()) {
       throw nn_error("Failed to load layer. Loader for " + layer_name +
                      " is not found.\n"
@@ -142,6 +146,9 @@ inline void finish_loading_layer(cereal::JSONInputArchive &ia) {
 **/
 template <typename InputArchive>
 std::shared_ptr<layer> layer::load_layer(InputArchive &ia) {
+  #ifdef PRINT_DEBUG
+    printf("[deserialization_helper/load_layer] Starting loading layer\n");
+  #endif
   start_loading_layer(ia);
 
   std::string p;
@@ -149,6 +156,9 @@ std::shared_ptr<layer> layer::load_layer(InputArchive &ia) {
   auto l = deserialization_helper<InputArchive>::get_instance().load(p, ia);
 
   finish_loading_layer(ia);
+  #ifdef PRINT_DEBUG
+    printf("[deserialization_helper/load_layer] Finished loading layer\n");
+  #endif
 
   return l;
 }

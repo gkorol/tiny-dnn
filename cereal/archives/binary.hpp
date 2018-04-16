@@ -32,6 +32,9 @@
 #include <cereal/cereal.hpp>
 #include <sstream>
 
+//Korol
+#include <string.h>
+
 namespace cereal
 {
   // ######################################################################
@@ -95,10 +98,23 @@ namespace cereal
       //! Reads size bytes of data from the input stream
       void loadBinary( void * const data, std::size_t size )
       {
-        auto const readSize = static_cast<std::size_t>( itsStream.rdbuf()->sgetn( reinterpret_cast<char*>( data ), size ) );
+        // auto const readSize = static_cast<std::size_t>( itsStream.rdbuf()->sgetn( reinterpret_cast<char*>( data ), size ) );
+        // Korol
+        char* temp = new char[size];
+        itsStream.read(temp, size);
+        #ifdef PRINT_DEBUG
+          printf("[cereal/loadBinary] Read from stream into temp array\n");
+        #endif
+        
+        for (std::size_t i=0; i<size; ++i) {
+          reinterpret_cast<char*>(data)[i] = temp[i];
+        }
 
-        if(readSize != size)
-          throw Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
+        #ifdef PRINT_DEBUG
+          printf("[cereal/loadBinary] Read input stream of %d bytes\n", size);
+        #endif
+        // if(readSize != size)
+        //   throw Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
       }
 
     private:
@@ -121,7 +137,13 @@ namespace cereal
   typename std::enable_if<std::is_arithmetic<T>::value, void>::type
   CEREAL_LOAD_FUNCTION_NAME(BinaryInputArchive & ar, T & t)
   {
+    #ifdef PRINT_DEBUG
+      printf("[cereal/CEREAL_LOAD_FUNCTION_NAME] Calling loadBinary POD of %d\n", sizeof(t));
+    #endif
     ar.loadBinary(std::addressof(t), sizeof(t));
+    #ifdef PRINT_DEBUG
+      printf("[cereal/CEREAL_LOAD_FUNCTION_NAME] Returning loadBinary POD of %d\n", sizeof(t));
+    #endif
   }
 
   //! Serializing NVP types to binary
@@ -151,6 +173,9 @@ namespace cereal
   template <class T> inline
   void CEREAL_LOAD_FUNCTION_NAME(BinaryInputArchive & ar, BinaryData<T> & bd)
   {
+    #ifdef PRINT_DEBUG
+      printf("[cereal/CEREAL_LOAD_FUNCTION_NAME] Calling loadBinary\n");
+    #endif
     ar.loadBinary(bd.data, static_cast<std::size_t>(bd.size));
   }
 } // namespace cereal

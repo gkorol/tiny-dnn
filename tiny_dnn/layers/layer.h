@@ -485,6 +485,10 @@ class layer : public node {
    *
    */
   void forward() {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[layer/forward] Forward internal to layer\n");
+    #endif
     // the computational graph
     std::vector<tensor_t *> in_data(in_channels_), out_data(out_channels_);
 
@@ -509,6 +513,10 @@ class layer : public node {
       ith_out_node(i)->clear_grads();
     }
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[layer/forward] Calling forward propagation\n");
+    #endif
     // call the forward computation kernel/routine
     forward_propagation(in_data, out_data);
   }

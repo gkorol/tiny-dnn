@@ -10,6 +10,9 @@
 #include <cstddef>
 #include <cstdint>
 
+// Korol
+#define PRINT_DEBUG
+
 /**
  * define if you want to use intel TBB library
  */
@@ -45,7 +48,7 @@
  */
 #define CNN_USE_STDOUT
 
-// #define CNN_SINGLE_THREAD
+#define CNN_SINGLE_THREAD
 
 /**
  * disable serialization/deserialization function
@@ -58,7 +61,7 @@
  * Enable Image API support.
  * Currently we use stb by default.
  **/
-//#define DNN_USE_IMAGE_API
+// #define DNN_USE_IMAGE_API
 
 /**
  * Enable Gemmlowp support.

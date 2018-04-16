@@ -1,5 +1,6 @@
 #include <iostream>
 #include "tiny_dnn/tiny_dnn.h"
+#include <stdio.h>
 
 using namespace tiny_dnn;
 using namespace tiny_dnn::activation;
@@ -35,14 +36,27 @@ void recognize(const std::string &model_name,
                const std::string &src_filename) {
   network<sequential> nn;
 
+  // Korol
+  #ifdef PRINT_DEBUG
+    cout << "[Main/recognize] Loading Model" << endl;
+  #endif
   // Load the model
   nn.load(model_name);
 
+
+  // Korol
+  #ifdef PRINT_DEBUG
+  cout << "[Main/recognize] Converting image" << endl;
+  #endif
   // convert imagefile to vec_t
   vec_t data;
   convert_image(src_filename, 227, 227, data);
 
   // recognize
+  // Korol
+  #ifdef PRINT_DEBUG
+  cout << "[Main/recognize] Calling predict method" << endl;
+  #endif
   auto res = nn.predict(data);
   vector<pair<double, int>> scores;
 
