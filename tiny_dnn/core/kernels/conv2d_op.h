@@ -43,11 +43,21 @@ class Conv2dOp : public core::OpKernel {
     #endif
 
     if (engine == core::backend_t::internal) {
+      // Korol
+      #ifdef PRINT_DEBUG
+      printf("[Conv2dOp/compute] Calling op internal\n");
+      #endif
       kernels::conv2d_op_internal(in_data, W[0], bias[0], out_data, params,
                                   context.parallelize());
     } else if (engine == core::backend_t::nnpack) {
+      #ifdef PRINT_DEBUG
+      printf("[Conv2dOp/compute] Calling op nnpack\n");
+      #endif
       kernels::conv2d_op_nnpack(in_data, W[0], bias[0], out_data, params);
     } else if (engine == core::backend_t::avx) {
+      #ifdef PRINT_DEBUG
+      printf("[Conv2dOp/compute] Calling op avx\n");
+      #endif
       kernels::conv2d_op_avx(in_data, W[0], bias[0], out_data, params,
                              context.parallelize());
     } else {

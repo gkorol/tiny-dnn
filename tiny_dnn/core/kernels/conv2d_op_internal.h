@@ -16,6 +16,51 @@ inline void conv2d_op_internal(const tensor_t &in_data,
                                tensor_t &out_data,
                                const core::conv_params &params,
                                const bool parallelize) {
+  // Korol
+  #ifdef PRINT_DEBUG
+  printf("\n[conv2d_op_internal] Convolution Layer Operation (internal)\n");
+
+  printf("Layer Input (padded): %d x %d x %d \nLayer Output = %d x %d x %d \nFilter %d x %d \nStride = %d\n",
+  params.in_padded.width_,
+  params.in_padded.width_,
+  params.in.depth_,
+  params.out.width_,
+  params.out.height_,
+  params.out.depth_,
+  params.weight.width_,
+  params.weight.height_,
+  params.w_stride);
+
+  printf("FOR sample = r.begin() : r.end()\n \
+         \tFOR o = 0 : %d \n\
+         \t|\tFOR inc = 0 : %d \n\
+         \t|\t|\tpin = in[in_padded.get_index(0, 0, inc)]\n\
+         \t|\t|\tpw  = W[weight.get_index(0, 0, id * o + inc)]\n\
+         \t|\t|\tFOR y = 0 : %d \n\
+         \t|\t|\t|\tpin_line = pin\n\
+         \t|\t|\t|\tFOR x = 0 : %d \n\
+         \t|\t|\t|\t|\tsum = 0\n\
+         \t|\t|\t|\t|\tpw_element = pin_line\n\
+         \t|\t|\t|\t|\tpin_element = pw\n\
+         \t|\t|\t|\t|\tFOR wx = 0 : %d \n\
+         \t|\t|\t|\t|\t|\tFOR wy = 0 : %d \n\
+         \t|\t|\t|\t|\t|\t|\tsum += pw_element[wx] * pin_element[wx]\n \
+         \t|\t|\t|\t|\t|\tpw_element += kw \n\
+         \t|\t|\t|\t|\t|\tpin_element += iw \n\
+         \t|\t|\t|\t|\tpout[x] += sum \n\
+         \t|\t|\t|\t|\tpin_line += elem_stride\n\
+         \t|\t|\t|\tpout += ow \n\
+         \t|\t|\t|\tpin += line_stride\n\
+         \t|\tvectorize::add(bias[o], out_area, pa)\n\
+         \n\n",
+       params.out.depth_,
+       params.in.depth_,
+       params.out.height_,
+       params.out.width_,
+       params.weight.height_,
+       params.weight.width_);
+  #endif
+
   for_(parallelize, 0, in_data.size(),
        [&](const blocked_range &r) {
          size_t out_area           = params.out.area();

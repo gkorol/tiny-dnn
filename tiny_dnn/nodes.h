@@ -49,22 +49,22 @@ void load(Archive &ar, std::vector<std::shared_ptr<tiny_dnn::layer>> &v) {
   #endif
 
   for (size_t i = 0; i < size; i++) {
-    #ifdef PRINT_DEBUG
-      printf("[nodes/load] Looping over layers : %d\n", i);
-    #endif
+    // #ifdef PRINT_DEBUG
+    //   printf("[nodes/load] Looping over layers : %d\n", i);
+    // #endif
     v.emplace_back(tiny_dnn::layer::load_layer(ar));
 
-    #ifdef PRINT_DEBUG
-      struct sysinfo memInfo;
-      sysinfo (&memInfo);
-      long long virtualMemUsed = memInfo.totalram - memInfo.freeram;
-      virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
-      virtualMemUsed *= memInfo.mem_unit;
-      long long physMemUsed = memInfo.totalram - memInfo.freeram;
-      physMemUsed *= memInfo.mem_unit;
-      printf("[nodes/load] VIRTUAL MEM AVAIL %lld\n", virtualMemUsed);
-      printf("[nodes/load] PHYSICAL MEM AVAIL %lld\n", physMemUsed);
-    #endif
+    // #ifdef PRINT_DEBUG
+    //   struct sysinfo memInfo;
+    //   sysinfo (&memInfo);
+    //   long long virtualMemUsed = memInfo.totalram - memInfo.freeram;
+    //   virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
+    //   virtualMemUsed *= memInfo.mem_unit;
+    //   long long physMemUsed = memInfo.totalram - memInfo.freeram;
+    //   physMemUsed *= memInfo.mem_unit;
+    //   printf("[nodes/load] VIRTUAL MEM AVAIL %lld\n", virtualMemUsed);
+    //   printf("[nodes/load] PHYSICAL MEM AVAIL %lld\n", physMemUsed);
+    // #endif
   }
 
 #else
