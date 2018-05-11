@@ -65,6 +65,10 @@ class fully_connected_layer : public layer {
 
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+     // Kor"ol
+     #ifdef PRINT_DEBUG
+       printf("[fully_connected_layer/forward_propagation] Inside FULLY CONNECTED layer forward prop\n");
+     #endif
     // forward fully connected op context
     auto ctx = OpKernelContext(in_data, out_data);
     ctx.setParallelize(layer::parallelize());

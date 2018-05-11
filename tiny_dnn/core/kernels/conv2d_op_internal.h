@@ -31,7 +31,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
   params.weight.height_,
   params.w_stride);
 
-  printf("FOR sample = r.begin() : r.end()\n \
+  printf("FOR sample = r.begin() : r.end()\n\
          \tFOR o = 0 : %d \n\
          \t|\tFOR inc = 0 : %d \n\
          \t|\t|\tpin = in[in_padded.get_index(0, 0, inc)]\n\
@@ -44,7 +44,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
          \t|\t|\t|\t|\tpin_element = pw\n\
          \t|\t|\t|\t|\tFOR wx = 0 : %d \n\
          \t|\t|\t|\t|\t|\tFOR wy = 0 : %d \n\
-         \t|\t|\t|\t|\t|\t|\tsum += pw_element[wx] * pin_element[wx]\n \
+         \t|\t|\t|\t|\t|\t|\tsum += pw_element[wx] * pin_element[wx]\n\
          \t|\t|\t|\t|\t|\tpw_element += kw \n\
          \t|\t|\t|\t|\t|\tpin_element += iw \n\
          \t|\t|\t|\t|\tpout[x] += sum \n\

@@ -21,6 +21,11 @@ class MaxPoolOp : public core::OpKernel {
     : core::OpKernel(context) {}
 
   void compute(const core::OpKernelContext &context) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[MaxPoolOp/compute] Inside max pool kernel\n");
+    #endif
+
     auto &params = OpKernel::params_->maxpool();
 
     // incomimg/outcoming data
@@ -36,6 +41,12 @@ class MaxPoolOp : public core::OpKernel {
     const core::backend_t engine = context.engine();
 
     if (engine == core::backend_t::internal) {
+      // Korol
+      #ifdef PRINT_DEBUG
+      printf("[MaxPoolOp/compute] Calling op internal\n");
+      printf("[maxpool_op_internal] Pool size x = %d, Pool size y = %d, Stride x = %d, Stride y = %d\n",
+        params.pool_size_x, params.pool_size_y, params.stride_x, params.stride_y);
+      #endif
       kernels::maxpool_op_internal(in_data, out_data, params.out2inmax,
                                    params.out2in, context.parallelize());
     } else if (engine == core::backend_t::nnpack) {
@@ -51,8 +62,16 @@ class MaxPoolOp : public core::OpKernel {
       }
 
       */
+      // Korol
+      #ifdef PRINT_DEBUG
+      printf("[MaxPoolOp/compute] Calling op nnpack\n");
+      #endif
       kernels::maxpool_op_nnpack(in_data, out_data, params);
     } else if (engine == core::backend_t::avx) {
+      // Korol
+      #ifdef PRINT_DEBUG
+      printf("[MaxPoolOp/compute] Calling op avx\n");
+      #endif
       kernels::maxpool_op_avx(in_data, out_data, params.out2inmax,
                               params.out2in, context.parallelize());
     } else {

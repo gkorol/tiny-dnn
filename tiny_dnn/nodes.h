@@ -321,8 +321,12 @@ class sequential : public nodes {
     // Korol
     #ifdef PRINT_DEBUG
     printf("[sequential/forward] Calling node forward\n");
+    printf("[sequential/forward] For l in all nodes\n");
     #endif
     for (auto l : nodes_) {
+      #ifdef PRINT_DEBUG
+      printf("[sequential/forward] l->forward\n");
+      #endif
       l->forward();
     }
 
@@ -627,21 +631,21 @@ void nodes::save_model(OutputArchive &oa) const {
 
 template <typename InputArchive>
 void nodes::load_model(InputArchive &ia) {
-  #ifdef PRINT_DEBUG
-    printf("[nodes/load_model] Loading InputArchive to nodes\n");
-  #endif
+  // #ifdef PRINT_DEBUG
+  //   printf("[nodes/load_model] Loading InputArchive to nodes\n");
+  // #endif
 
 #ifndef CNN_NO_SERIALIZATION
   own_nodes_.clear();
   nodes_.clear();
 
-  #ifdef PRINT_DEBUG
-    printf("[nodes/load_model] Calling make_nvp\n");
-  #endif
+  // #ifdef PRINT_DEBUG
+  //   printf("[nodes/load_model] Calling make_nvp\n");
+  // #endif
   ia(cereal::make_nvp("nodes", own_nodes_));
-  #ifdef PRINT_DEBUG
-    printf("[nodes/load_model] Returning from make_nvp\n");
-  #endif
+  // #ifdef PRINT_DEBUG
+  //   printf("[nodes/load_model] Returning from make_nvp\n");
+  // #endif
 
   for (auto &n : own_nodes_) {
     nodes_.push_back(&*n);

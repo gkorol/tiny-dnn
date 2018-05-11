@@ -16,6 +16,24 @@ inline void maxpool_op_internal(
   std::vector<std::vector<serial_size_t>> &max_idx,
   const std::vector<std::vector<serial_size_t>> &out2in,
   const bool layer_parallelize) {
+  // Korol
+  #ifdef PRINT_DEBUG
+  printf("[maxpool_op_internal] Max Pool Layer Operation (internal)\n");
+
+  printf("\tFOR i = 0 : %ld (out2in.size)\n\
+         \t|\tin_index = out2in[i] \n\
+         \t|\tmax_value = numeric_limits::lowest \n\
+         \t|\tidx = 0 \n\
+         \t|\tFOR j = 0 : %ld (all in_index) \n\
+         \t|\t|\tif in[j] > max_value {\n\
+         \t|\t|\t|\tmax_value = in[j]\n\
+         \t|\t|\t|\tidx = j }\n\
+         \t|\tmax[i] = idx\n\
+         \t|\tout[i] = max_value\n\
+         \t\n\n",
+       out2in.size(),
+       out2in[0].size() );
+  #endif
   for_i(layer_parallelize, in_data.size(), [&](int sample) {
     const vec_t &in                 = in_data[sample];
     vec_t &out                      = out_data[sample];

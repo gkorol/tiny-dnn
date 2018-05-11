@@ -21,6 +21,11 @@ class FullyConnectedOp : public core::OpKernel {
     : core::OpKernel(context) {}
 
   void compute(const core::OpKernelContext &context) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[FullyConnectedOp/compute] Inside fully connected kernel\n");
+    #endif
+
     auto params = OpKernel::params_->fully();
 
     // incomimg/outcoming data
@@ -37,6 +42,10 @@ class FullyConnectedOp : public core::OpKernel {
     const core::backend_t engine = context.engine();
 
     if (engine == core::backend_t::internal) {
+      // Korol
+      #ifdef PRINT_DEBUG
+      printf("[FullyConnectedOp/compute] Calling op internal\n");
+      #endif
       kernels::fully_connected_op_internal(
         in_data, W[0], params.has_bias_ ? (*bias)[0] : vec_t(), out_data,
         params, context.parallelize());

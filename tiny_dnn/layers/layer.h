@@ -444,6 +444,10 @@ class layer : public node {
    */
   std::vector<tensor_t> forward(
     const std::vector<tensor_t> &input) {  // for test
+    // Korol
+    #ifdef PRINT_DEBUG
+      printf("[layer/forward] Layer <tensor_t> forward\n");
+    #endif
     // allocate data in the computational graph without
     // resetting the weights.
     setup(false);
@@ -515,7 +519,7 @@ class layer : public node {
 
     // Korol
     #ifdef PRINT_DEBUG
-    printf("[layer/forward] Calling forward propagation\n");
+    printf("[layer/forward] Calling forward propagation (in_data -> out_data)\n");
     #endif
     // call the forward computation kernel/routine
     forward_propagation(in_data, out_data);

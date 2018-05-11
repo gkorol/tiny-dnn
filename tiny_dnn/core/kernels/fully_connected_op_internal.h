@@ -18,6 +18,23 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
                                         tensor_t &out_data,
                                         const fully_params &params,
                                         const bool layer_parallelize) {
+  // Korol
+  #ifdef PRINT_DEBUG
+  printf("[fully_connected_op_internal] Fully Connected Layer Operation (internal)\n");
+  printf("Layer Input = %d\nLayer Output = %d\nWeights %ld\n",
+  params.in_size_,
+  params.out_size_,
+  W.size());
+
+  printf("\tFOR i = 0 : %d\n\
+         \t|\tout[i] = 0\n\
+         \t|\tFOR c = 0 : %d\n\
+         \t|\t|\tout[i] += W[c * params.out_size_ + i] * in[c]\n\
+         \t|\tout[i] += bias[i];\n\
+         \t\n\n",
+       params.out_size_,
+       params.in_size_);
+  #endif
   for_i(layer_parallelize, in_data.size(), [&](int sample) {
     const vec_t &in = in_data[sample];
     vec_t &out      = out_data[sample];

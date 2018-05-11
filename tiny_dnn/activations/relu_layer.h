@@ -18,6 +18,14 @@ class relu_layer : public activation_layer {
   std::string layer_type() const override { return "relu-activation"; }
 
   void forward_activation(const vec_t &x, vec_t &y) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+     printf("[relu_layer/forward_propagation] ReLU Layer Operation\n");
+     printf("\tFOR j = 0 : %ld\n\
+            \t|\ty[j] = std::max(float_t(0), x[j])\n\
+            \t\n\n",
+          x.size());
+    #endif
     for (serial_size_t j = 0; j < x.size(); j++) {
       y[j] = std::max(float_t(0), x[j]);
     }
