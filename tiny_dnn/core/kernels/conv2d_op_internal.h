@@ -7,6 +7,8 @@
 */
 #pragma once
 
+#include <fstream>
+
 namespace tiny_dnn {
 namespace kernels {
 
@@ -114,6 +116,42 @@ inline void conv2d_op_internal(const tensor_t &in_data,
          }
        },
        0);
+
+   // typedef std::vector<float_t, aligned_allocator<float_t, 64>> vec_t;
+   // typedef std::vector<vec_t> tensor_t;
+
+   if (params.out.depth_ == 96 && params.weight.height_ == 11 && params.weight.width_ == 11) {
+     // Verdadeiro so no primeiro layer convolucional
+
+     // Escreve entrada em arquivo binario
+     std::ofstream fout_indata;
+     fout_indata.open("IN_DATA.dat", std::ios::out | std::ofstream::binary);
+     for (unsigned sample = 0; sample < in_data.size(); ++sample) {
+       const vec_t &in = in_data[sample];
+       fout_indata.write(reinterpret_cast<const char *>(&in[0]),
+       (in.size())*sizeof(float_t));
+     }
+
+     // Escreve saida em arquivo binario
+     std::ofstream fout_outdata;
+     fout_outdata.open("OUT_DATA.dat", std::ios::out | std::ofstream::binary);
+     for (unsigned sample = 0; sample < in_data.size(); ++sample) {
+       const vec_t &a = out_data[sample];
+       fout_outdata.write(reinterpret_cast<const char *>(&a[0]),
+       (a.size())*sizeof(float_t));
+     }
+
+     // Escreve pesos em arquivo binario
+     std::ofstream fout_filter;
+     fout_filter.open("FILTER.dat", std::ios::out | std::ofstream::binary);
+     // int size = W.size();
+     // fout_filter.write(reinterpret_cast<const char *>(&size), sizeof(size));
+     for (int d=0; d < params.out.depth_; ++d) {
+       fout_filter.write(reinterpret_cast<const char *>(&W[0]),
+       (params.weight.height_*params.weight.width_)*sizeof(float_t));
+     }
+     fout_filter.close();
+   }
 }
 
 /******************************************************************/
