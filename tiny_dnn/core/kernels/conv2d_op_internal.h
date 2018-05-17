@@ -22,16 +22,19 @@ inline void conv2d_op_internal(const tensor_t &in_data,
   #ifdef PRINT_DEBUG
   printf("\n[conv2d_op_internal] Convolution Layer Operation (internal)\n");
 
-  printf("Layer Input (padded): %d x %d x %d \nLayer Output = %d x %d x %d \nFilter %d x %d \nStride = %d\n",
+  printf("Layer Input (padded): %d x %d x %d \nLayer Output = %d x %d x %d \nOutput Area = %d \nFilter %d x %d \nBias = %ld\nElement stride = %d\nLine stride = %d\n",
   params.in_padded.width_,
   params.in_padded.width_,
   params.in.depth_,
   params.out.width_,
   params.out.height_,
   params.out.depth_,
+  params.out.area(),
   params.weight.width_,
   params.weight.height_,
-  params.w_stride);
+  bias.size(),
+  params.w_stride,
+  params.in_padded.width_ * params.h_stride);
 
   printf("FOR sample = r.begin() : r.end()\n\
          \tFOR o = 0 : %d \n\
@@ -126,31 +129,28 @@ inline void conv2d_op_internal(const tensor_t &in_data,
      // Escreve entrada em arquivo binario
      std::ofstream fout_indata;
      fout_indata.open("IN_DATA.dat", std::ios::out | std::ofstream::binary);
-     for (unsigned sample = 0; sample < in_data.size(); ++sample) {
-       const vec_t &in = in_data[sample];
-       fout_indata.write(reinterpret_cast<const char *>(&in[0]),
-       (in.size())*sizeof(float_t));
-     }
+     const vec_t &in = in_data[0];
+     fout_indata.write(reinterpret_cast<const char *>(&in[0]), in.size()*sizeof(float_t));
+     fout_indata.close();
 
      // Escreve saida em arquivo binario
      std::ofstream fout_outdata;
      fout_outdata.open("OUT_DATA.dat", std::ios::out | std::ofstream::binary);
-     for (unsigned sample = 0; sample < in_data.size(); ++sample) {
-       const vec_t &a = out_data[sample];
-       fout_outdata.write(reinterpret_cast<const char *>(&a[0]),
-       (a.size())*sizeof(float_t));
-     }
+     const vec_t &a = out_data[0];
+     fout_outdata.write(reinterpret_cast<const char *>(&a[0]), a.size()*sizeof(float_t));
+     fout_outdata.close();
 
      // Escreve pesos em arquivo binario
      std::ofstream fout_filter;
      fout_filter.open("FILTER.dat", std::ios::out | std::ofstream::binary);
-     // int size = W.size();
-     // fout_filter.write(reinterpret_cast<const char *>(&size), sizeof(size));
-     for (int d=0; d < params.out.depth_; ++d) {
-       fout_filter.write(reinterpret_cast<const char *>(&W[0]),
-       (params.weight.height_*params.weight.width_)*sizeof(float_t));
-     }
+     fout_filter.write(reinterpret_cast<const char *>(&W[0]), W.size()*sizeof(float_t));
      fout_filter.close();
+
+     // Escreve biases em arquivo binario
+     std::ofstream fout_bias;
+     fout_bias.open("BIAS.dat", std::ios::out | std::ofstream::binary);
+     fout_bias.write(reinterpret_cast<const char *>(&bias[0]), bias.size()*sizeof(float_t));
+     fout_bias.close();
    }
 }
 

@@ -24,8 +24,11 @@
 [conv2d_op_internal] Convolution Layer Operation (internal)
 Layer Input (padded): 227 x 227 x 3 
 Layer Output = 55 x 55 x 96 
+Output Area = 3025 
 Filter 11 x 11 
-Stride = 4
+Bias = 96
+Element stride = 4
+Line stride = 908
 FOR sample = r.begin() : r.end()
          	FOR o = 0 : 96 
          	|	FOR inc = 0 : 3 
@@ -49,6 +52,9 @@ FOR sample = r.begin() : r.end()
          	|	vectorize::add(bias[o], out_area, pa)
          
 
+IN[55] = -61.939003
+W[55] = -0.025793
+BIAS[55] = -0.088521
 [sequential/forward] l->forward
 [layer/forward] Forward internal to layer
 [layer/forward] Calling forward propagation (in_data -> out_data)
@@ -95,8 +101,11 @@ FOR sample = r.begin() : r.end()
 [conv2d_op_internal] Convolution Layer Operation (internal)
 Layer Input (padded): 31 x 31 x 96 
 Layer Output = 27 x 27 x 256 
+Output Area = 729 
 Filter 5 x 5 
-Stride = 1
+Bias = 256
+Element stride = 1
+Line stride = 31
 FOR sample = r.begin() : r.end()
          	FOR o = 0 : 256 
          	|	FOR inc = 0 : 96 
@@ -166,8 +175,11 @@ FOR sample = r.begin() : r.end()
 [conv2d_op_internal] Convolution Layer Operation (internal)
 Layer Input (padded): 15 x 15 x 256 
 Layer Output = 13 x 13 x 384 
+Output Area = 169 
 Filter 3 x 3 
-Stride = 1
+Bias = 384
+Element stride = 1
+Line stride = 15
 FOR sample = r.begin() : r.end()
          	FOR o = 0 : 384 
          	|	FOR inc = 0 : 256 
@@ -214,8 +226,11 @@ FOR sample = r.begin() : r.end()
 [conv2d_op_internal] Convolution Layer Operation (internal)
 Layer Input (padded): 15 x 15 x 384 
 Layer Output = 13 x 13 x 384 
+Output Area = 169 
 Filter 3 x 3 
-Stride = 1
+Bias = 384
+Element stride = 1
+Line stride = 15
 FOR sample = r.begin() : r.end()
          	FOR o = 0 : 384 
          	|	FOR inc = 0 : 384 
@@ -262,8 +277,11 @@ FOR sample = r.begin() : r.end()
 [conv2d_op_internal] Convolution Layer Operation (internal)
 Layer Input (padded): 15 x 15 x 384 
 Layer Output = 13 x 13 x 256 
+Output Area = 169 
 Filter 3 x 3 
-Stride = 1
+Bias = 256
+Element stride = 1
+Line stride = 15
 FOR sample = r.begin() : r.end()
          	FOR o = 0 : 256 
          	|	FOR inc = 0 : 384 
