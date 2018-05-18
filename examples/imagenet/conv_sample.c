@@ -43,15 +43,17 @@ int main(int argc, char** argv) {
   int f_x;     // Filter x coordiniate
   int f_y;     // Filter y coordinate
 
-  // Auxiliary variables
   float sum;
   float * in_el;
   float * f_el;
-  float * o_line;
-  float * out_slice;
   float * in_slice;
   float * filter_slice;
   float * in_line;
+  float * o_line;
+  float * out_slice;
+
+  float error;
+  float max;
 
   filter_f = fopen("FILTER.dat","rb");
   in_f = fopen("IN_DATA.dat","rb");
@@ -66,11 +68,11 @@ int main(int argc, char** argv) {
   printf("Input size  = %ld\n", sizeof(IN)/sizeof(float) );
   printf("Filter size = %ld\n", sizeof(W)/sizeof(float) );
   printf("Bias size   = %ld\n", sizeof(BIAS)/sizeof(float) );
-  // printf("Input out test = %ld\n\n", sizeof(OUT_TEST)/sizeof(float) );
+  printf("Input out test = %ld\n\n", sizeof(OUT_TEST)/sizeof(float) );
 
   // Inicializa OUT
   for( i = 0; i < (OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH); ++i) {
-    OUT[i] = 0.0;
+    OUT[i] = 0.0f;
   }
 
   // CONVOLUCAO
@@ -105,6 +107,9 @@ int main(int argc, char** argv) {
           for ( f_y = 0; f_y < FILTER_HEIGHT; f_y++) {
             for ( f_x = 0; f_x < FILTER_WIDTH; f_x++) {
               sum += f_el[f_x] * in_el[f_x];
+              // if( i_s == 0 && o_s == 0) {
+              //   printf("%f\n", sum);
+              // }
               // Multiplica posicao no filtro atual com posicao na janela atual de entrada
             }
             f_el += FILTER_WIDTH;
@@ -132,13 +137,26 @@ int main(int argc, char** argv) {
     }
   }
 
+  error = 0.0;
+  max = 0.0;
 
   for( o_s = 0; o_s < OUT_DEPTH; ++o_s ) {
     printf("OUTPUT SLICE %d\n", o_s);
     for(o_x = 0; o_x < OUT_HEIGHT*OUT_WIDTH; ++o_x) {
-      printf("OUT[%4d] = %+6f | OUT_TEST[%4d] = %+6f\n", o_x, OUT[o_x], o_x, OUT_TEST[o_x]);
+
+      if ( OUT[o_x]-OUT_TEST[o_x] < 0) {
+        error = -1.0 * (OUT[o_x]-OUT_TEST[o_x]);
+      } else {
+        error = OUT[o_x]-OUT_TEST[o_x];
+      }
+      printf("OUT[%4d] = %+2.6f | OUT_TEST[%4d] = %+2.6f\t-> %+2.6f\n", o_x, OUT[o_x], o_x, OUT_TEST[o_x], error);
+      if ((OUT[o_x]-OUT_TEST[o_x]) > max) {
+        max = error;
+      }
     }
   }
+
+  printf("Max Error = %f\n", max);
 
   fclose(filter_f);
   fclose(in_f);

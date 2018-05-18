@@ -133,6 +133,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
      fout_indata.write(reinterpret_cast<const char *>(&in[0]), in.size()*sizeof(float_t));
      fout_indata.close();
 
+
      // Escreve saida em arquivo binario
      std::ofstream fout_outdata;
      fout_outdata.open("OUT_DATA.dat", std::ios::out | std::ofstream::binary);
