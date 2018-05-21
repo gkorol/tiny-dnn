@@ -19,6 +19,9 @@ inline void maxpool_op_internal(
   // Korol
   #ifdef PRINT_DEBUG
   printf("[maxpool_op_internal] Max Pool Layer Operation (internal)\n");
+  printf("Layer Input Size = %ld\nLayer Output Size = %ld\n",
+  in_data[0].size(),
+  out_data[0].size());
 
   printf("\tFOR i = 0 : %ld (out2in.size)\n\
          \t|\tin_index = out2in[i] \n\

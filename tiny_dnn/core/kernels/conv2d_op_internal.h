@@ -128,7 +128,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
 
      // Escreve entrada em arquivo binario
      std::ofstream fout_indata;
-     fout_indata.open("IN_DATA.dat", std::ios::out | std::ofstream::binary);
+     fout_indata.open("IN_DATA_CONV.dat", std::ios::out | std::ofstream::binary);
      const vec_t &in = in_data[0];
      fout_indata.write(reinterpret_cast<const char *>(&in[0]), in.size()*sizeof(float_t));
      fout_indata.close();
@@ -136,20 +136,20 @@ inline void conv2d_op_internal(const tensor_t &in_data,
 
      // Escreve saida em arquivo binario
      std::ofstream fout_outdata;
-     fout_outdata.open("OUT_DATA.dat", std::ios::out | std::ofstream::binary);
+     fout_outdata.open("OUT_DATA_CONV.dat", std::ios::out | std::ofstream::binary);
      const vec_t &a = out_data[0];
      fout_outdata.write(reinterpret_cast<const char *>(&a[0]), a.size()*sizeof(float_t));
      fout_outdata.close();
 
      // Escreve pesos em arquivo binario
      std::ofstream fout_filter;
-     fout_filter.open("FILTER.dat", std::ios::out | std::ofstream::binary);
+     fout_filter.open("FILTER_CONV.dat", std::ios::out | std::ofstream::binary);
      fout_filter.write(reinterpret_cast<const char *>(&W[0]), W.size()*sizeof(float_t));
      fout_filter.close();
 
      // Escreve biases em arquivo binario
      std::ofstream fout_bias;
-     fout_bias.open("BIAS.dat", std::ios::out | std::ofstream::binary);
+     fout_bias.open("BIAS_CONV.dat", std::ios::out | std::ofstream::binary);
      fout_bias.write(reinterpret_cast<const char *>(&bias[0]), bias.size()*sizeof(float_t));
      fout_bias.close();
    }

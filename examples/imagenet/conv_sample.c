@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+// Valores do primeiro layer
+
 #define FILTER_HEIGHT 11
 #define FILTER_WIDTH  11
 #define K_FILTERS     96
@@ -14,10 +16,6 @@
 
 #define STRIDE 4
 #define LINE_STRIDE (STRIDE * IN_HEIGHT)
-
-int get_index(int x, int y, int channel, int h, int w) {
-  return (h * channel + y) * w + x;
-}
 
 int main(int argc, char** argv) {
   int i;
@@ -55,10 +53,10 @@ int main(int argc, char** argv) {
   float error;
   float max;
 
-  filter_f = fopen("FILTER.dat","rb");
-  in_f = fopen("IN_DATA.dat","rb");
-  out_f = fopen("OUT_DATA.dat","rb");
-  bias_f = fopen("BIAS.dat","rb");
+  filter_f = fopen("FILTER_CONV.dat","rb");
+  in_f = fopen("IN_DATA_CONV.dat","rb");
+  out_f = fopen("OUT_DATA_CONV.dat","rb");
+  bias_f = fopen("BIAS_CONV.dat","rb");
 
   fread(W,sizeof(W),1,filter_f);
   fread(IN,sizeof(IN),1,in_f);
@@ -72,7 +70,7 @@ int main(int argc, char** argv) {
 
   // Inicializa OUT
   for( i = 0; i < (OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH); ++i) {
-    OUT[i] = 0.0f;
+    OUT[i] = 0.0;
   }
 
   // CONVOLUCAO
@@ -162,4 +160,6 @@ int main(int argc, char** argv) {
   fclose(in_f);
   fclose(out_f);
   fclose(bias_f);
+
+  return 0;
 }
