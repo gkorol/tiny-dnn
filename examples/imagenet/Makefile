@@ -25,3 +25,13 @@ clean:
 
 run:
 	./alexnet tiny-model-alexnet classes.txt cat.jpg
+
+conv_sample:
+	rm -f conv_sample
+	gcc -Wall conv_sample.c -o conv_sample -lm
+
+fc_sample:
+	rm -f fc_sample
+	gcc -Wall fc_sample.c -o fc_sample -lm
+
+#valgrind --tool=massif --pages-as-heap=yes --heap=yes ./fc_sample

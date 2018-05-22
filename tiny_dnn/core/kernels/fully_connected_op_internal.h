@@ -60,51 +60,29 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
 
     // Escreve entrada em arquivo binario
     std::ofstream fout_indata;
-    fout_indata.open("IN_DATA_FC.dat", std::ios::out | std::ofstream::binary);
+    fout_indata.open("IN_DATA_FC.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
     const vec_t &in = in_data[0];
     fout_indata.write(reinterpret_cast<const char *>(&in[0]), params.in_size_*sizeof(float_t));
     fout_indata.close();
 
-    for (int i=0; i < params.in_size_; ++i){
-      printf("%f\n", in[i]);
-    }
-
     // Escreve saida em arquivo binario
     std::ofstream fout_outdata;
-    fout_outdata.open("OUT_DATA_FC.dat", std::ios::out | std::ofstream::binary);
+    fout_outdata.open("OUT_DATA_FC.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
     const vec_t &a = out_data[0];
     fout_outdata.write(reinterpret_cast<const char *>(&a[0]), params.out_size_*sizeof(float_t));
     fout_outdata.close();
 
-    // printf("a[0] = %f\n",    a[0]);
-    // printf("a[1000] = %f\n", a[1000]);
-    // printf("a[537] = %f\n",  a[537]);
-    // printf("a[5038] = %f\n", a[5038]);
-    // printf("a[37] = %f\n",   a[37]);
-
     // Escreve pesos em arquivo binario
     std::ofstream fout_filter;
-    fout_filter.open("FILTER_FC.dat", std::ios::out | std::ofstream::binary);
+    fout_filter.open("FILTER_FC.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
     fout_filter.write(reinterpret_cast<const char *>(&(W[0])), W.size()*sizeof(float_t));
     fout_filter.close();
 
-    // printf("W[0] = %f\n",    W[0]);
-    // printf("W[1000] = %f\n", W[1000]);
-    // printf("W[537] = %f\n",  W[537]);
-    // printf("W[5038] = %f\n", W[5038]);
-    // printf("W[37] = %f\n",   W[37]);
-
     // Escreve biases em arquivo binario
     std::ofstream fout_bias;
-    fout_bias.open("BIAS_FC.dat", std::ios::out | std::ofstream::binary);
+    fout_bias.open("BIAS_FC.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
     fout_bias.write(reinterpret_cast<const char *>(&(bias[0])), bias.size()*sizeof(float_t));
     fout_bias.close();
-
-    // printf("bias[0] = %f\n",    bias[0]);
-    // printf("bias[1000] = %f\n", bias[1000]);
-    // printf("bias[537] = %f\n",  bias[537]);
-    // printf("bias[5038] = %f\n", bias[5038]);
-    // printf("bias[37] = %f\n",   bias[37]);
   }
 }
 
