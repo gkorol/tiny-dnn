@@ -120,7 +120,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
        },
        0);
 
-   // if (in_data[0].size() == 4096 && out_data[0].size() == 1000 && bias.size() == 1000 && W.size() == 4096000) {
+   // if (in_data[0].size() == 154587 && out_data[0].size() == 290400 && bias.size() == 96 && W.size() == 34848) {
    //   // Verdadeiro so no primeiro layer convolucional
    //
    //   std::ofstream fout_indata;
@@ -138,7 +138,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
    //   fout_outdata.close();
    //
    //   std::ofstream fout_filter;
-   //   fout_filter.open("transfer_files/FILTER.dat", std::ios::out | std::ios::trunc);
+   //   fout_filter.open("transfer_files/FILTER_DATA.dat", std::ios::out | std::ios::trunc);
    //   for( int i=0; i < W.size(); i++) {
    //     fout_filter << W[i] << std::endl;
    //   }
@@ -152,9 +152,9 @@ inline void conv2d_op_internal(const tensor_t &in_data,
    //   fout_bias.close();
    //
    // }
-   // else {
-   //   printf("FAILED FILE WRITING:\nIN SIZE = %ld\tOUT SIZE = %ld\tBIAS SIZE = %ld\tW SIZE = %ld\n", in_data[0].size(), out_data[0].size(), bias.size(), W.size());
-   // }
+   // // else {
+   // //   printf("FAILED FILE WRITING:\nIN SIZE = %ld\tOUT SIZE = %ld\tBIAS SIZE = %ld\tW SIZE = %ld\n", in_data[0].size(), out_data[0].size(), bias.size(), W.size());
+   // // }
 }
 
 /******************************************************************/
