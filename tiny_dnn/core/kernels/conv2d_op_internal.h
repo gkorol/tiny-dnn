@@ -24,7 +24,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
 
   printf("Layer Input (padded): %d x %d x %d \nLayer Output = %d x %d x %d \nOutput Area = %d \nFilter %d x %d \nBias = %ld\nElement stride = %d\nLine stride = %d\n",
   params.in_padded.width_,
-  params.in_padded.width_,
+  params.in_padded.height_,
   params.in.depth_,
   params.out.width_,
   params.out.height_,
@@ -82,9 +82,9 @@ inline void conv2d_op_internal(const tensor_t &in_data,
            const vec_t &in = in_data[sample];
            vec_t &a        = out_data[sample];
            for (serial_size_t o = 0; o < od; o++) {
-             float_t *pa = &a[params.out.get_index(0, 0, o)];
+             float_t *pa = &a[params.out.get_index(0, 0, o)];//
              for (serial_size_t inc = 0; inc < id; inc++) {
-               if (!params.tbl.is_connected(o, inc)) continue;
+               // if (!params.tbl.is_connected(o, inc)) continue;
                serial_size_t idx;
                idx                = params.weight.get_index(0, 0, id * o + inc);
                const float_t *pw  = &W[idx];
@@ -92,7 +92,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
                const float_t *pin = &in[idx];
                float_t *pout      = pa;
                for (serial_size_t y = 0; y < oh; y++) {
-                 const float_t *pin_line = pin;
+                 const float_t *pin_line = pin; //
                  for (serial_size_t x = 0; x < ow; x++) {
                    const float_t *pin_element = pin_line;
                    const float_t *pw_element  = pw;
@@ -120,40 +120,41 @@ inline void conv2d_op_internal(const tensor_t &in_data,
        },
        0);
 
-   // typedef std::vector<float_t, aligned_allocator<float_t, 64>> vec_t;
-   // typedef std::vector<vec_t> tensor_t;
-
-   if (params.out.depth_ == 96 && params.weight.height_ == 11 && params.weight.width_ == 11) {
-   // if (params.in.depth_ == 96 && params.in_padded.width_ == 31 && params.out.width_ == 27 && bias.size() == 256 && params.out.depth_ == 256 && params.weight.height_ == 5 && params.weight.width_ == 5) {
-     // Verdadeiro so no primeiro layer convolucional
-
-     // Escreve entrada em arquivo binario
-     std::ofstream fout_indata;
-     fout_indata.open("IN_DATA_CONV.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
-     const vec_t &in = in_data[0];
-     fout_indata.write(reinterpret_cast<const char *>(&in[0]), in.size()*sizeof(float_t));
-     fout_indata.close();
-
-
-     // Escreve saida em arquivo binario
-     std::ofstream fout_outdata;
-     fout_outdata.open("OUT_DATA_CONV.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
-     const vec_t &a = out_data[0];
-     fout_outdata.write(reinterpret_cast<const char *>(&a[0]), a.size()*sizeof(float_t));
-     fout_outdata.close();
-
-     // Escreve pesos em arquivo binario
-     std::ofstream fout_filter;
-     fout_filter.open("FILTER_CONV.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
-     fout_filter.write(reinterpret_cast<const char *>(&W[0]), W.size()*sizeof(float_t));
-     fout_filter.close();
-
-     // Escreve biases em arquivo binario
-     std::ofstream fout_bias;
-     fout_bias.open("BIAS_CONV.dat", std::ios::out | std::ofstream::binary | std::ios::trunc);
-     fout_bias.write(reinterpret_cast<const char *>(&bias[0]), bias.size()*sizeof(float_t));
-     fout_bias.close();
-   }
+   // if (in_data[0].size() == 4096 && out_data[0].size() == 1000 && bias.size() == 1000 && W.size() == 4096000) {
+   //   // Verdadeiro so no primeiro layer convolucional
+   //
+   //   std::ofstream fout_indata;
+   //   fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
+   //   for( int i=0; i < in_data[0].size(); i++) {
+   //     fout_indata << in_data[0][i] << std::endl;
+   //   }
+   //   fout_indata.close();
+   //
+   //   std::ofstream fout_outdata;
+   //   fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
+   //   for( int i=0; i < out_data[0].size(); i++) {
+   //    fout_outdata << out_data[0][i] << std::endl;
+   //    }
+   //   fout_outdata.close();
+   //
+   //   std::ofstream fout_filter;
+   //   fout_filter.open("transfer_files/FILTER.dat", std::ios::out | std::ios::trunc);
+   //   for( int i=0; i < W.size(); i++) {
+   //     fout_filter << W[i] << std::endl;
+   //   }
+   //   fout_filter.close();
+   //
+   //   std::ofstream fout_bias;
+   //   fout_bias.open("transfer_files/BIAS_DATA.dat", std::ios::out | std::ios::trunc);
+   //   for( int i=0; i < bias.size(); i++) {
+   //     fout_bias << bias[i] << std::endl;
+   //   }
+   //   fout_bias.close();
+   //
+   // }
+   // else {
+   //   printf("FAILED FILE WRITING:\nIN SIZE = %ld\tOUT SIZE = %ld\tBIAS SIZE = %ld\tW SIZE = %ld\n", in_data[0].size(), out_data[0].size(), bias.size(), W.size());
+   // }
 }
 
 /******************************************************************/

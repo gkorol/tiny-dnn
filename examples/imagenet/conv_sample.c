@@ -1,24 +1,59 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 // Valores do primeiro layer
 
-#define FILTER_HEIGHT 11
-#define FILTER_WIDTH  11
-#define K_FILTERS     96
+// #define BIPARTITE 0
+// #define FILTER_HEIGHT 11
+// #define FILTER_WIDTH  11
+// #define K_FILTERS     96
+//
+// #define IN_HEIGHT 227
+// #define IN_WIDTH  227
+// #define IN_DEPTH  3
+//
+// #define OUT_HEIGHT 55
+// #define OUT_WIDTH  55
+// #define OUT_DEPTH  96
+// #define STRIDE 4
+// #define LINE_STRIDE 908 //(STRIDE * IN_HEIGHT)
 
-#define IN_HEIGHT 227
-#define IN_WIDTH  227
-#define IN_DEPTH  3
+#include "param_headers/weight_614400.h"
+#include "param_headers/in_92256.h"
+#include "param_headers/bias_256.h"
 
-#define OUT_HEIGHT 55
-#define OUT_WIDTH  55
-#define OUT_DEPTH  96
+#define BIPARTITE 1
+#define FILTER_HEIGHT 5
+#define FILTER_WIDTH  5
+#define K_FILTERS     256
 
-#define STRIDE 4
-#define LINE_STRIDE (STRIDE * IN_HEIGHT)
+#define IN_HEIGHT 31
+#define IN_WIDTH  31
+#define IN_DEPTH  96
+
+#define OUT_HEIGHT 27
+#define OUT_WIDTH  27
+#define OUT_DEPTH  256
+#define STRIDE 1
+#define LINE_STRIDE 31 //(STRIDE * IN_HEIGHT)
+
+// #define BIPARTITE 1
+// #define FILTER_HEIGHT 3
+// #define FILTER_WIDTH  3
+// #define K_FILTERS     256
+//
+// #define IN_HEIGHT 15
+// #define IN_WIDTH  15
+// #define IN_DEPTH  384
+//
+// #define OUT_HEIGHT 27
+// #define OUT_WIDTH  27
+// #define OUT_DEPTH  256
+// #define STRIDE 1
+// #define LINE_STRIDE 15 //(STRIDE * IN_HEIGHT)
 
 int main(int argc, char** argv) {
-  int i;
+  unsigned i;
 
   // Input/Output Files
   FILE *filter_f;
@@ -26,20 +61,13 @@ int main(int argc, char** argv) {
   FILE *bias_f;
   FILE *out_f;
 
-  // Input/Output vectors
-  float W[FILTER_WIDTH*FILTER_HEIGHT*K_FILTERS];
-  float IN[IN_WIDTH*IN_HEIGHT*IN_DEPTH];
-  float BIAS[OUT_DEPTH];
-  float OUT_TEST[OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH];
-  float OUT[OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH];
-
   // Loop indexes
-  int o_s;     // Output depth slice
-  int i_s;     // Input depth slice
-  int o_x;     // Output x coordinate
-  int o_y;     // Output y coordinate
-  int f_x;     // Filter x coordiniate
-  int f_y;     // Filter y coordinate
+  unsigned o_s;     // Output depth slice
+  unsigned i_s;     // Input depth slice
+  unsigned o_x;     // Output x coordinate
+  unsigned o_y;     // Output y coordinate
+  unsigned f_x;     // Filter x coordiniate
+  unsigned f_y;     // Filter y coordinate
 
   float sum;
   float * in_el;
@@ -53,20 +81,57 @@ int main(int argc, char** argv) {
   float error;
   float max;
 
-  filter_f = fopen("FILTER_CONV.dat","rb");
-  in_f = fopen("IN_DATA_CONV.dat","rb");
-  out_f = fopen("OUT_DATA_CONV.dat","rb");
-  bias_f = fopen("BIAS_CONV.dat","rb");
+  // in_f = fopen("transfer_files/IN_DATA_CONV.dat","rb");
+  // filter_f = fopen("transfer_files/FILTER_CONV.dat","rb");
+  // bias_f = fopen("transfer_files/BIAS_CONV.dat","rb");
+  out_f = fopen("transfer_files/OUT_DATA_CONV.dat","rb");
 
-  fread(W,sizeof(W),1,filter_f);
-  fread(IN,sizeof(IN),1,in_f);
-  fread(BIAS,sizeof(BIAS),1,bias_f);
-  fread(OUT_TEST,sizeof(OUT_TEST),1,out_f);
+  size_t alloc_size;
+  // Input/Output vectors
+  // Dynamically allocating, so they dont blow the stack out!
+  alloc_size = IN_WIDTH*IN_HEIGHT*IN_DEPTH;
+  float * IN = malloc( alloc_size * sizeof(float));
+  if (!IN) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  for (i=0; i < alloc_size; ++i){
+    // fscanf(in_f, "%f", &(IN[i]));
+    IN[i] = in[i];
+  }
+  // fclose(in_f);
 
-  printf("Input size  = %ld\n", sizeof(IN)/sizeof(float) );
-  printf("Filter size = %ld\n", sizeof(W)/sizeof(float) );
-  printf("Bias size   = %ld\n", sizeof(BIAS)/sizeof(float) );
-  printf("Input out test = %ld\n\n", sizeof(OUT_TEST)/sizeof(float) );
+  alloc_size = OUT_DEPTH;
+  float * BIAS = malloc(alloc_size * sizeof(float));
+  if (!BIAS) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  for (i=0; i < alloc_size; ++i){
+    // fscanf(bias_f, "%f", &(BIAS[i]));
+    BIAS[i] = bias[i];
+  }
+  // fclose(bias_f);
+
+  alloc_size = OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH;
+  float * OUT_TEST = malloc(alloc_size * sizeof(float));
+  if (!OUT_TEST) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  for (i=0; i < alloc_size; ++i){
+    fscanf(out_f, "%f", &(OUT_TEST[i]));
+  }
+  fclose(out_f);
+
+  float * OUT = malloc(alloc_size * sizeof(float));
+  if (!OUT) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+  alloc_size = FILTER_WIDTH*FILTER_HEIGHT*IN_DEPTH*K_FILTERS;
+  float * W = malloc( alloc_size * sizeof(float));
+  if (!W) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  for (i=0; i < alloc_size; ++i){
+    // fscanf(filter_f, "%f", &(W[i]));
+    W[i] = weight[i];
+  }
+  // fclose(filter_f);
+
+  printf("Input size  = %d\n", IN_WIDTH*IN_HEIGHT*IN_DEPTH );
+  printf("Weight size = %d\n", FILTER_WIDTH*FILTER_HEIGHT*IN_DEPTH*K_FILTERS );
+  printf("Bias size   = %d\n", OUT_DEPTH );
+  printf("Input out test = %d\n\n", OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH );
+
 
   // Inicializa OUT
   for( i = 0; i < (OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH); ++i) {
@@ -78,10 +143,28 @@ int main(int argc, char** argv) {
     out_slice = &OUT[o_s*OUT_HEIGHT*OUT_WIDTH];
     // Aponta para slice (ou canal) da saída (0 ~ 95)
 
-    for ( i_s = 0; i_s < IN_DEPTH; i_s++) {
-      filter_slice  = &W[ (o_s*FILTER_HEIGHT*FILTER_WIDTH*IN_DEPTH) + (i_s*FILTER_HEIGHT*FILTER_WIDTH) ];
-      // Aponta para conjunto de filtros que gera cada slice de saida (0 ~ 95)
+    for ( i_s = 0; i_s < IN_DEPTH ; i_s++) {
 
+      // if( BIPARTITE && o_s < (OUT_DEPTH/2) ) {
+      //   if( i_s < (IN_DEPTH/2) ) {
+      //     // fprintf(test, "o_s = %d , i_s = %d -> 0\n", o_s, i_s);
+      //     break;
+      //   } else {
+      //     // fprintf(test, "o_s = %d , i_s = %d -> 1\n", o_s, i_s);
+      //     continue;
+      //   }
+      // } else if (BIPARTITE) {
+      //   if( i_s < (IN_DEPTH/2) ) {
+      //     // fprintf(test, "o_s = %d , i_s = %d -> 1\n", o_s, i_s);
+      //     continue;
+      //   } else {
+      //     // fprintf(test, "o_s = %d , i_s = %d -> 0\n", o_s, i_s);
+      //     break;
+      //   }
+      // }
+
+      filter_slice  = &W[ (o_s*FILTER_HEIGHT*FILTER_WIDTH*IN_DEPTH) + (i_s*FILTER_HEIGHT*FILTER_WIDTH) ]; //
+      // Aponta para conjunto de filtros que gera cada slice de saida (0 ~ 95)
       in_slice = &IN[ i_s*IN_HEIGHT*IN_WIDTH ];
       // Aponta para slice da entrada (R G B)
 
@@ -102,12 +185,11 @@ int main(int argc, char** argv) {
           sum = 0.0;
           // Inicializa somatorio
 
+          // fprintf(test, "%3d %3d %3d %3d %3d\n", o_s, i_s, o_y, o_x, (o_s*FILTER_HEIGHT*FILTER_WIDTH*IN_DEPTH) + (i_s*FILTER_HEIGHT*FILTER_WIDTH));
+
           for ( f_y = 0; f_y < FILTER_HEIGHT; f_y++) {
             for ( f_x = 0; f_x < FILTER_WIDTH; f_x++) {
-              sum += f_el[f_x] * in_el[f_x];
-              // if( i_s == 0 && o_s == 0) {
-              //   printf("%f\n", sum);
-              // }
+              sum += f_el[f_x] * in_el[f_x]; //
               // Multiplica posicao no filtro atual com posicao na janela atual de entrada
             }
             f_el += FILTER_WIDTH;
@@ -129,6 +211,7 @@ int main(int argc, char** argv) {
         // Proxima linha (considerando strides)
       }
     }
+
     for(i = 0; i < OUT_HEIGHT*OUT_WIDTH; i++) {
       out_slice[i] += BIAS[o_s];
       // Soma bias no slice
@@ -137,29 +220,31 @@ int main(int argc, char** argv) {
 
   error = 0.0;
   max = 0.0;
+  i = 0;
+
+  // for( i = 0; i < OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH; ++i) {
+  //   fprintf(test, "%.6f\n", OUT[i]);
+  // }
 
   for( o_s = 0; o_s < OUT_DEPTH; ++o_s ) {
     printf("OUTPUT SLICE %d\n", o_s);
     for(o_x = 0; o_x < OUT_HEIGHT*OUT_WIDTH; ++o_x) {
 
-      if ( OUT[o_x]-OUT_TEST[o_x] < 0) {
-        error = -1.0 * (OUT[o_x]-OUT_TEST[o_x]);
+      i = o_s*OUT_HEIGHT*OUT_WIDTH + o_x;
+
+      if ( OUT[i]-OUT_TEST[i] < 0) {
+        error = -1.0 * (OUT[i]-OUT_TEST[i]);
       } else {
-        error = OUT[o_x]-OUT_TEST[o_x];
+        error = OUT[i]-OUT_TEST[i];
       }
-      printf("OUT[%4d] = %+2.6f | OUT_TEST[%4d] = %+2.6f\t-> %+2.6f\n", o_x, OUT[o_x], o_x, OUT_TEST[o_x], error);
-      if ((OUT[o_x]-OUT_TEST[o_x]) > max) {
+      printf("OUT[%4d] = %+2.6f | OUT_TEST[%4d] = %+2.6f -> %+2.6f\n", i, OUT[i], i, OUT_TEST[i], error);
+      if (error > max) {
         max = error;
       }
     }
   }
 
   printf("Max Error = %f\n", max);
-
-  fclose(filter_f);
-  fclose(in_f);
-  fclose(out_f);
-  fclose(bias_f);
 
   return 0;
 }

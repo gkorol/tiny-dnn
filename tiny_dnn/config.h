@@ -11,7 +11,7 @@
 #include <cstdint>
 
 // Korol
-#define PRINT_DEBUG
+// #define PRINT_DEBUG
 
 /**
  * define if you want to use intel TBB library
