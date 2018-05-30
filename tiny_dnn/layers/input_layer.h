@@ -25,6 +25,10 @@ class input_layer : public layer {
 
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[input_layer/forward_propagation] Calling input_layer forward propagation\n");
+    #endif
     *out_data[0] = *in_data[0];
   }
 

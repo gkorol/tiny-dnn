@@ -1,42 +1,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Valores do primeiro layer
+/******* Layer Conv 1 ********/
+#include "param_headers/1_weight.h"
+#include "param_headers/1_in.h"
+#include "param_headers/1_bias.h"
+#define BIPARTITE 0
+#define FILTER_HEIGHT 11
+#define FILTER_WIDTH  11
+#define K_FILTERS     96
+#define IN_HEIGHT 227
+#define IN_WIDTH  227
+#define IN_DEPTH  3
+#define OUT_HEIGHT 55
+#define OUT_WIDTH  55
+#define OUT_DEPTH  96
+#define STRIDE 4
+#define LINE_STRIDE 908 //(STRIDE * IN_HEIGHT)
+/*****************************/
 
-// #define BIPARTITE 0
-// #define FILTER_HEIGHT 11
-// #define FILTER_WIDTH  11
-// #define K_FILTERS     96
+/******* Layer Conv 2 ********/
+// #include "param_headers/2_weight.h"
+// #include "param_headers/2_in.h"
+// #include "param_headers/2_bias.h"
+// #define BIPARTITE 1
+// #define FILTER_HEIGHT 5
+// #define FILTER_WIDTH  5
+// #define K_FILTERS     256
 //
-// #define IN_HEIGHT 227
-// #define IN_WIDTH  227
-// #define IN_DEPTH  3
+// #define IN_HEIGHT 31
+// #define IN_WIDTH  31
+// #define IN_DEPTH  96
 //
-// #define OUT_HEIGHT 55
-// #define OUT_WIDTH  55
-// #define OUT_DEPTH  96
-// #define STRIDE 4
-// #define LINE_STRIDE 908 //(STRIDE * IN_HEIGHT)
+// #define OUT_HEIGHT 27
+// #define OUT_WIDTH  27
+// #define OUT_DEPTH  256
+// #define STRIDE 1
+// #define LINE_STRIDE 31 //(STRIDE * IN_HEIGHT)
+/*****************************/
 
-#include "param_headers/weight_614400.h"
-#include "param_headers/in_92256.h"
-#include "param_headers/bias_256.h"
+/******* Layer Conv 3 ********/
+// #include "param_headers/3_weight.h"
+// #include "param_headers/3_in.h"
+// #include "param_headers/3_bias.h"
+// #define BIPARTITE 1
+// #define FILTER_HEIGHT 3
+// #define FILTER_WIDTH  3
+// #define K_FILTERS     256
+//
+// #define IN_HEIGHT 15
+// #define IN_WIDTH  15
+// #define IN_DEPTH  256
+//
+// #define OUT_HEIGHT 13
+// #define OUT_WIDTH  13
+// #define OUT_DEPTH  384
+// #define STRIDE 1
+// #define LINE_STRIDE 15 //(STRIDE * IN_HEIGHT)
+/*****************************/
 
-#define BIPARTITE 1
-#define FILTER_HEIGHT 5
-#define FILTER_WIDTH  5
-#define K_FILTERS     256
+/******* Layer Conv 4 ********/
+// #include "param_headers/4_weight.h"
+// #include "param_headers/4_in.h"
+// #include "param_headers/4_bias.h"
+// #define BIPARTITE 1
+// #define FILTER_HEIGHT 3
+// #define FILTER_WIDTH  3
+// #define K_FILTERS     384
+//
+// #define IN_HEIGHT 13
+// #define IN_WIDTH  13
+// #define IN_DEPTH  384
+//
+// #define OUT_HEIGHT 15
+// #define OUT_WIDTH  15
+// #define OUT_DEPTH  384
+// #define STRIDE 1
+// #define LINE_STRIDE 13 //(STRIDE * IN_HEIGHT)
+/*****************************/
 
-#define IN_HEIGHT 31
-#define IN_WIDTH  31
-#define IN_DEPTH  96
-
-#define OUT_HEIGHT 27
-#define OUT_WIDTH  27
-#define OUT_DEPTH  256
-#define STRIDE 1
-#define LINE_STRIDE 31 //(STRIDE * IN_HEIGHT)
-
+/******* Layer Conv 5 ********/
+// #include "param_headers/5_weight.h"
+// #include "param_headers/5_in.h"
+// #include "param_headers/5_bias.h"
 // #define BIPARTITE 1
 // #define FILTER_HEIGHT 3
 // #define FILTER_WIDTH  3
@@ -46,19 +92,17 @@
 // #define IN_WIDTH  15
 // #define IN_DEPTH  384
 //
-// #define OUT_HEIGHT 27
-// #define OUT_WIDTH  27
+// #define OUT_HEIGHT 13
+// #define OUT_WIDTH  13
 // #define OUT_DEPTH  256
 // #define STRIDE 1
 // #define LINE_STRIDE 15 //(STRIDE * IN_HEIGHT)
+/*****************************/
 
 int main(int argc, char** argv) {
   unsigned i;
 
   // Input/Output Files
-  FILE *filter_f;
-  FILE *in_f;
-  FILE *bias_f;
   FILE *out_f;
 
   // Loop indexes
@@ -81,10 +125,7 @@ int main(int argc, char** argv) {
   float error;
   float max;
 
-  // in_f = fopen("transfer_files/IN_DATA_CONV.dat","rb");
-  // filter_f = fopen("transfer_files/FILTER_CONV.dat","rb");
-  // bias_f = fopen("transfer_files/BIAS_CONV.dat","rb");
-  out_f = fopen("transfer_files/OUT_DATA_CONV.dat","rb");
+  out_f = fopen("transfer_files/OUT_DATA.dat","r");
 
   size_t alloc_size;
   // Input/Output vectors
@@ -93,19 +134,15 @@ int main(int argc, char** argv) {
   float * IN = malloc( alloc_size * sizeof(float));
   if (!IN) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
-    // fscanf(in_f, "%f", &(IN[i]));
-    IN[i] = in[i];
+    IN[i] = in_1[i];
   }
-  // fclose(in_f);
 
   alloc_size = OUT_DEPTH;
   float * BIAS = malloc(alloc_size * sizeof(float));
   if (!BIAS) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
-    // fscanf(bias_f, "%f", &(BIAS[i]));
-    BIAS[i] = bias[i];
+    BIAS[i] = bias_1[i];
   }
-  // fclose(bias_f);
 
   alloc_size = OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH;
   float * OUT_TEST = malloc(alloc_size * sizeof(float));
@@ -122,10 +159,8 @@ int main(int argc, char** argv) {
   float * W = malloc( alloc_size * sizeof(float));
   if (!W) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
-    // fscanf(filter_f, "%f", &(W[i]));
-    W[i] = weight[i];
+    W[i] = weight_1[i];
   }
-  // fclose(filter_f);
 
   printf("Input size  = %d\n", IN_WIDTH*IN_HEIGHT*IN_DEPTH );
   printf("Weight size = %d\n", FILTER_WIDTH*FILTER_HEIGHT*IN_DEPTH*K_FILTERS );
@@ -221,10 +256,6 @@ int main(int argc, char** argv) {
   error = 0.0;
   max = 0.0;
   i = 0;
-
-  // for( i = 0; i < OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH; ++i) {
-  //   fprintf(test, "%.6f\n", OUT[i]);
-  // }
 
   for( o_s = 0; o_s < OUT_DEPTH; ++o_s ) {
     printf("OUTPUT SLICE %d\n", o_s);

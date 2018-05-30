@@ -230,6 +230,10 @@ class deconvolutional_layer : public layer {
 
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[deconvolutional_layer/forward_propagation] Calling deconvolutional_layer forward propagation\n");
+    #endif
     // launch deconvolutional kernel
     layer::backend_->deconv2d(in_data, out_data);
   }

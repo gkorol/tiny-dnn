@@ -75,6 +75,11 @@ class slice_layer : public layer {
 
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[slice_layer/forward_propagation] Calling slice_layer forward propagation\n");
+    #endif
+
     switch (slice_type_) {
       case slice_type::slice_samples:
         slice_data_forward(*in_data[0], out_data);

@@ -49,6 +49,7 @@ class MaxPoolOp : public core::OpKernel {
       #endif
       kernels::maxpool_op_internal(in_data, out_data, params.out2inmax,
                                    params.out2in, context.parallelize());
+
     } else if (engine == core::backend_t::nnpack) {
       // NNPACK supports stride != 2 or pool_size !=2
       // there's optimization over stride=2 and pool_size=2

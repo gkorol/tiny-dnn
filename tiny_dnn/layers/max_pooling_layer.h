@@ -121,7 +121,7 @@ class max_pooling_layer : public layer {
                            std::vector<tensor_t *> &out_data) override {
     // Korol
     #ifdef PRINT_DEBUG
-      printf("[max_pooling_layer/forward_propagation] Inside MAXPOOL layer forward prop\n");
+      printf("[max_pooling_layer/forward_propagation] Inside max_pooling_layer layer forward prop\n");
     #endif
     // forward convolutional op context
     auto ctx = OpKernelContext(in_data, out_data);
@@ -196,7 +196,9 @@ class max_pooling_layer : public layer {
       for (serial_size_t dx = 0; dx < dxmax; dx++) {
         serial_size_t in_index = params_.in.get_index(
           static_cast<serial_size_t>(outx * params_.stride_x + dx),
-          static_cast<serial_size_t>(outy * params_.stride_y + dy), c);
+          static_cast<serial_size_t>(outy * params_.stride_y + dy),
+          c);
+
         serial_size_t out_index = params_.out.get_index(outx, outy, c);
 
         if (in_index >= params_.in2out.size()) {
@@ -209,11 +211,46 @@ class max_pooling_layer : public layer {
         params_.out2in[out_index].push_back(in_index);
       }
     }
+
+    // Korol
+    // #ifdef PRINT_DEBUG
+    // printf("[max_pooling_layer/connect_kernel] Connecting kernel\n");
+    // // printf("dxmax = min(%d,%d) = %d, dymax = min(%d,%d) = %d, outx = %d, outy = %d\n",
+    //   // pooling_size_x, params_.in.width_ - outx * params_.stride_x, dxmax,
+    //   // pooling_size_y, params_.in.height_ - outy * params_.stride_y, dymax,
+    //   // outx, outy );
+    //
+    //   printf("\
+    //   FOR (serial_size_t dy = 0; dy < %d; dy++) {\n\
+    //   |\tFOR (serial_size_t dx = 0; dx < %d; dx++) {\n\
+    //   |\t|\tserial_size_t in_index = params_.in.get_index(\n\
+    //   |\t|\tstatic_cast<serial_size_t>(%d * %d + dx),\n\
+    //   |\t|\tstatic_cast<serial_size_t>(%d * %d + dy), %d);\n\
+    //   |\t|\tserial_size_t out_index = params_.out.get_index(%d, %d, %d);\n\
+    //   |\t|\tparams_.in2out[in_index] = out_index;\n\
+    //   |\t|\tparams_.out2in[out_index].push_back(in_index);\n",
+    //       dymax,
+    //       dxmax,
+    //       outx, params_.stride_x,
+    //       outy, params_.stride_y,c,
+    //       outx, outy, c);
+    // #endif
   }
 
   void init_connection() {
     params_.in2out.resize(params_.in.size());
     params_.out2in.resize(params_.out.size());
+    // Korol
+    // #ifdef PRINT_DEBUG
+    // printf("[max_pooling_layer/init_connection] Initting kernel\n");
+    // printf("\
+    // FOR (serial_size_t c = 0; c < %d; ++c) {\n\
+    // |\tFOR (serial_size_t y = 0; y < %d; ++y) {\n\
+    // |\t|\tFOR (serial_size_t x = 0; x < %d; ++x) {\n",
+    //     params_.in.depth_,
+    //     params_.out.height_,
+    //     params_.out.width_ );
+    // #endif
 
     for (serial_size_t c = 0; c < params_.in.depth_; ++c) {
       for (serial_size_t y = 0; y < params_.out.height_; ++y) {

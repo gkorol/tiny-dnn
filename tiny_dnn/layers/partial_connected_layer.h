@@ -65,6 +65,11 @@ class partial_connected_layer : public layer {
     const vec_t &b     = (*in_data[2])[0];
     tensor_t &out      = *out_data[0];
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[partial_connected_layer/forward_propagation] Calling partial_connected_layer forward propagation\n");
+    #endif
+
     // @todo revise the parallelism strategy
     for (serial_size_t sample       = 0,
                        sample_count = static_cast<serial_size_t>(in.size());

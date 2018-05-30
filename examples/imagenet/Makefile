@@ -26,13 +26,23 @@ clean:
 run:
 	./alexnet tiny-model-alexnet classes.txt cat.jpg
 
+.PHONY: conv_sample
+
 conv_sample:
 	rm -f conv_sample
 	gcc -Wall conv_sample.c -o conv_sample -lm
 
+.PHONY: fc_sample
+
 fc_sample:
 	rm -f fc_sample
 	gcc -Wall fc_sample.c -o fc_sample -lm
+
+.PHONY: net
+
+net:
+	rm -f fc_sample
+	gcc -Wall net.c -o net -lm
 
 
 # NOTE
@@ -41,7 +51,6 @@ fc_sample:
 # $ valgrind --tool=massif --pages-as-heap=yes --heap=yes ./fc_sample
 #
 # Linha para gerar .h include files de parametros da rede
-# $ ./write_array.py 1 1 256 bias transfer_files/BIAS_CONV.dat param_headers/bias_256.h
-# $ ./write_array.py 31 31 96 in transfer_files/IN_DATA_CONV.dat param_headers/in_92256.h
-# $ ./write_array.py 25 96 256 weight transfer_files/FILTER_CONV.dat param_headers/weight_614400.h (1o arg é w.h pq pesos tem 4 dimensoes)
-#
+# $ ./write_array.py 227 227 3 in_1 transfer_files/IN_DATA.dat param_headers/1_in.h
+# $ ./write_array.py 121 3 96 weight_1 transfer_files/FILTER_DATA.dat param_headers/1_weight.h
+# $ ./write_array.py 1 1 96 bias_1 transfer_files/BIAS_DATA.dat param_headers/1_bias.h

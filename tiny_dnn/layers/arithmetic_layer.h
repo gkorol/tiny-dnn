@@ -43,6 +43,11 @@ class elementwise_add_layer : public layer {
 
     out = in1;
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[arithmatic_layer/forward_propagation] Calling arithmatic_layer forward propagation\n");
+    #endif
+
     // @todo parallelize
     for (size_t sample = 0; sample < in1.size(); ++sample) {
       for (serial_size_t i = 1; i < num_args_; i++) {

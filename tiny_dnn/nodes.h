@@ -324,6 +324,7 @@ class sequential : public nodes {
     printf("[sequential/forward] For l in all nodes\n");
     #endif
     for (auto l : nodes_) {
+      // std::vector<layer *> nodes_;
       #ifdef PRINT_DEBUG
       printf("[sequential/forward] l->forward\n");
       #endif

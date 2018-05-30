@@ -61,6 +61,11 @@ class quantized_fully_connected_layer : public layer {
 
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[quantized_fully_connected_layer/forward_propagation] Calling quantized_fully_connected_layer forward propagation\n");
+    #endif
+
     if (in_data.size() == 2 || in_data.size() == 3) {
       layer::backend_->fully_q(in_data, out_data);
 

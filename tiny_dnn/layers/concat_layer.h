@@ -65,6 +65,10 @@ class concat_layer : public layer {
     serial_size_t num_samples =
       static_cast<serial_size_t>((*out_data[0]).size());
 
+    #ifdef PRINT_DEBUG
+    printf("[concat_layer/forward_propagation] Calling concat_layer forward propagation\n");
+    #endif
+
     for (serial_size_t s = 0; s < num_samples; s++) {
       float_t *outs = &(*out_data[0])[s][0];
 

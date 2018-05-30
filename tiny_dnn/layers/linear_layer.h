@@ -48,6 +48,11 @@ class linear_layer : public layer {
     const tensor_t &in = *in_data[0];
     tensor_t &out      = *out_data[0];
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[linear_layer/forward_propagation] Calling linear_layer forward propagation\n");
+    #endif
+
     // do nothing
     CNN_UNREFERENCED_PARAMETER(out);
 

@@ -65,6 +65,11 @@ class global_average_pooling_layer : public layer {
     ctx.setParallelize(layer::parallelize());
     ctx.setEngine(layer::engine());
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[global_average_pooling_layer/forward_propagation] Calling global_average_pooling_layer forward propagation\n");
+    #endif
+
     kernel_fwd_->compute(ctx);
   }
 

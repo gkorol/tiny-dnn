@@ -22,13 +22,22 @@ class relu_layer : public activation_layer {
     #ifdef PRINT_DEBUG
      printf("[relu_layer/forward_propagation] ReLU Layer Operation\n");
      printf("\tFOR j = 0 : %ld\n\
-            \t|\ty[j] = std::max(float_t(0), x[j])\n\
-            \t\n\n",
+     \t|\ty[j] = std::max(float_t(0), x[j])\n\
+     \t\n\n",
           x.size());
     #endif
     for (serial_size_t j = 0; j < x.size(); j++) {
       y[j] = std::max(float_t(0), x[j]);
     }
+
+    // if (x.size() == 290400) {
+    //   std::ofstream fout_outdata;
+    //   fout_outdata.open("transfer_files/OUT_DATA_.dat", std::ios::out | std::ios::trunc);
+    //   for( int i=0; i < x.size(); i++) {
+    //    fout_outdata << std::fixed << y[i] << std::endl;
+    //   }
+    //   fout_outdata.close();
+    // }
   }
 
   void backward_activation(const vec_t &x,

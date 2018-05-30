@@ -56,20 +56,19 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
   });
 
 
-  // if (in_data[0].size() == 4096 && out_data[0].size() == 1000 && bias.size() == 1000 && W.size() == 4096000) {
+  // if (in_data[0].size() == 92256 && out_data[0].size() == 186624 && bias.size() == 256 && W.size() == 614400) {
   //
   //   std::ofstream fout_indata;
   //   fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
   //   for( int i=0; i < in_data[0].size(); i++) {
-  //     fout_indata << in_data[0][i] << std::endl;
+  //     fout_indata << std::fixed << in_data[0][i] << std::endl;
   //   }
   //   fout_indata.close();
   //
-  //   // Escreve saida em arquivo binario
   //   std::ofstream fout_outdata;
   //   fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
   //   for( int i=0; i < out_data[0].size(); i++) {
-  //    fout_outdata << out_data[0][i] << std::endl;
+  //    fout_outdata << std::fixed << out_data[0][i] << std::endl;
   //   }
   //   fout_outdata.close();
   //
@@ -77,7 +76,7 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
   //   std::ofstream fout_filter;
   //   fout_filter.open("transfer_files/FILTER_DATA.dat", std::ios::out | std::ios::trunc);
   //   for( int i=0; i < W.size(); i++) {
-  //     fout_filter << W[i] << std::endl;
+  //     fout_filter << std::fixed << W[i] << std::endl;
   //   }
   //   fout_filter.close();
   //
@@ -85,7 +84,7 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
   //   std::ofstream fout_bias;
   //   fout_bias.open("transfer_files/BIAS_DATA.dat", std::ios::out | std::ios::trunc);
   //   for( int i=0; i < bias.size(); i++) {
-  //     fout_bias << bias[i] << std::endl;
+  //     fout_bias << std::fixed << bias[i] << std::endl;
   //   }
   //   fout_bias.close();
   //

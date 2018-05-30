@@ -82,6 +82,12 @@ class lrn_layer : public layer {
 
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[lrn_layer/forward_propagation] Calling lrn_layer forward propagation\n");
+    #endif
+
     // @todo revise the parallelism strategy
     for (size_t sample = 0, sample_count = in_data[0]->size();
          sample < sample_count; ++sample) {
@@ -89,8 +95,16 @@ class lrn_layer : public layer {
       vec_t &out = (*out_data[0])[sample];
 
       if (region_ == norm_region::across_channels) {
+        // Korol
+        #ifdef PRINT_DEBUG
+        printf("[lrn_layer/forward_propagation] Calling lrn_layer forward forward_across\n");
+        #endif
         forward_across(in, out);
       } else {
+        // Korol
+        #ifdef PRINT_DEBUG
+        printf("[lrn_layer/forward_propagation] Calling lrn_layer forward forward_within\n");
+        #endif
         forward_within(in, out);
       }
     }
@@ -113,6 +127,21 @@ class lrn_layer : public layer {
   void forward_across(const vec_t &in, vec_t &out) {
     vectorize::fill(&in_square_[0], in_square_.size(), float_t{0});
 
+    #ifdef PRINT_DEBUG
+     printf("[lrn_layer/forward_across] LRN Operation\n");
+     printf("In size = %ld, Out size = %ld, size_ = %d, alpha = %f, beta = %f, in_square_ size = %ld\n",
+      in.size(), out.size(), size_, alpha_, beta_, in_square_.size());
+     printf("\tFOR i = 0 : %d\n\
+     \t|\tidx = in_shape_.get_index(0, 0, i);\n\
+     \t|\tadd_square_sum(&in[idx], %d, &in_square_[0]);\n\
+     \t\n\n",
+          size_ / 2, in_shape_.area());
+    #endif
+
+    // void add_square_sum(const float_t *src, serial_size_t size, float_t *dst) {
+    //   for (serial_size_t i = 0; i < size; i++) dst[i] += src[i] * src[i];
+    // }
+
     for (serial_size_t i = 0; i < size_ / 2; i++) {
       serial_size_t idx = in_shape_.get_index(0, 0, i);
       add_square_sum(&in[idx], in_shape_.area(), &in_square_[0]);
@@ -126,12 +155,10 @@ class lrn_layer : public layer {
 
     for (serial_size_t i = 0; i < channels; i++, head++, tail++) {
       if (head < channels)
-        add_square_sum(&in[in_shape_.get_index(0, 0, head)], wxh,
-                       &in_square_[0]);
+        add_square_sum(&in[in_shape_.get_index(0, 0, head)], wxh, &in_square_[0]);
 
       if (tail >= 0)
-        sub_square_sum(&in[in_shape_.get_index(0, 0, tail)], wxh,
-                       &in_square_[0]);
+        sub_square_sum(&in[in_shape_.get_index(0, 0, tail)], wxh, &in_square_[0]);
 
       float_t *dst       = &out[in_shape_.get_index(0, 0, i)];
       const float_t *src = &in[in_shape_.get_index(0, 0, i)];

@@ -95,23 +95,28 @@ class dropout_layer : public layer {
       mask_.resize(sample_count, mask_[0]);
     }
 
-    for (size_t sample = 0; sample < sample_count; ++sample) {
-      std::vector<uint8_t> &mask = mask_[sample];
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[dropout_layer/forward_propagation] Calling dropout forward propagation\n");
+    #endif
 
-      const vec_t &in_vec = in[sample];
-      vec_t &out_vec      = out[sample];
-
-      if (phase_ == net_phase::train) {
-        for (size_t i = 0; i < in_vec.size(); i++)
-          mask[i]     = bernoulli(dropout_rate_);
-
-        for (size_t i = 0; i < in_vec.size(); i++)
-          out_vec[i]  = mask[i] * scale_ * in_vec[i];
-      } else {
-        for (size_t i = 0, end = in_vec.size(); i < end; i++)
-          out_vec[i] = in_vec[i];
-      }
-    }
+    // for (size_t sample = 0; sample < sample_count; ++sample) {
+    //   std::vector<uint8_t> &mask = mask_[sample];
+    //
+    //   const vec_t &in_vec = in[sample];
+    //   vec_t &out_vec      = out[sample];
+    //
+    //   if (phase_ == net_phase::train) {
+    //     for (size_t i = 0; i < in_vec.size(); i++)
+    //       mask[i]     = bernoulli(dropout_rate_);
+    //
+    //     for (size_t i = 0; i < in_vec.size(); i++)
+    //       out_vec[i]  = mask[i] * scale_ * in_vec[i];
+    //   } else {
+    //     for (size_t i = 0, end = in_vec.size(); i < end; i++)
+    //       out_vec[i] = in_vec[i];
+    //   }
+    // }
   }
 
   /**

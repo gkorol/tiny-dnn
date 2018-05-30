@@ -135,6 +135,10 @@ class batch_normalization_layer : public layer {
     tensor_t &in  = *in_data[0];
     tensor_t &out = *out_data[0];
 
+    #ifdef PRINT_DEBUG
+    printf("[batch_normalization_layer/forward_propagation] Calling batch_normalization_layer forward propagation\n");
+    #endif
+
     if (phase_ == net_phase::train) {
       // calculate mean/variance from this batch in train phase
       moments(*in_data[0], in_spatial_size_, in_channels_, mean, variance);

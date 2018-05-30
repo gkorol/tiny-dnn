@@ -175,6 +175,10 @@ class average_unpooling_layer : public partial_connected_layer {
 
   void forward_propagation(const std::vector<tensor_t *> &in_data,
                            std::vector<tensor_t *> &out_data) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[average_unpooling_layer/forward_propagation] Calling average_unpooling_layer forward propagation\n");
+    #endif
     tiny_average_unpooling_kernel(parallelize_, in_data, out_data, out_,
                                   Base::scale_factor_, Base::out2wi_);
   }

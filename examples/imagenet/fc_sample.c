@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Valor do primeiro layer fully connected (layer 6)
-
+/******* Layer FC 6 ********/
+// #include "param_headers/6_weight.h"
+// #include "param_headers/6_in.h"
+// #include "param_headers/6_bias.h"
 // #define IN_HEIGHT 6
 // #define IN_WIDTH  6
 // #define IN_DEPTH  256
@@ -10,14 +12,33 @@
 // #define OUT_HEIGHT 4096
 // #define OUT_WIDTH  1
 // #define OUT_DEPTH  1
+/*****************************/
 
+/******* Layer FC 7 ********/
+// #include "param_headers/7_weight.h"
+// #include "param_headers/7_in.h"
+// #include "param_headers/7_bias.h"
+// #define IN_HEIGHT 4096
+// #define IN_WIDTH  1
+// #define IN_DEPTH  1
+//
+// #define OUT_HEIGHT 4096
+// #define OUT_WIDTH  1
+// #define OUT_DEPTH  1
+/*****************************/
+
+/******* Layer FC 8 ********/
+#include "param_headers/8_weight.h"
+#include "param_headers/8_in.h"
+#include "param_headers/8_bias.h"
 #define IN_HEIGHT 4096
 #define IN_WIDTH  1
 #define IN_DEPTH  1
 
-#define OUT_HEIGHT 4096
+#define OUT_HEIGHT 1000
 #define OUT_WIDTH  1
 #define OUT_DEPTH  1
+/*****************************/
 
 #define WEIGHT_HEIGHT IN_HEIGHT
 #define WEIGHT_WIDTH  IN_WIDTH
@@ -29,10 +50,6 @@
 int main(int argc, char** argv) {
   int i;
 
-  // Input/Output Files
-  FILE *weight_f;
-  FILE *in_f;
-  FILE *bias_f;
   FILE *out_f;
 
   // Loop indexes
@@ -42,10 +59,7 @@ int main(int argc, char** argv) {
   float error;
   float max;
 
-  weight_f = fopen("FILTER_FC.dat","rb");
-  in_f = fopen("IN_DATA_FC.dat","rb");
-  bias_f = fopen("BIAS_FC.dat","rb");
-  out_f = fopen("OUT_DATA_FC.dat","rb");
+  out_f = fopen("transfer_files/OUT_DATA.dat","r");
 
   size_t alloc_size;
   // Input/Output vectors
@@ -54,22 +68,21 @@ int main(int argc, char** argv) {
   float * IN = malloc( alloc_size * sizeof(float));
   if (!IN) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
-    fread(&IN[i], sizeof(float), 1, in_f);
+    IN[i] = in[i];
   }
-  fclose(in_f);
 
   alloc_size = OUT_HEIGHT;
   float * BIAS = malloc(alloc_size * sizeof(float));
   if (!BIAS) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
-    fread(&BIAS[i], sizeof(float), 1, bias_f);
+    BIAS[i] = bias[i];
   }
-  fclose(bias_f);
 
+  alloc_size = OUT_HEIGHT;
   float * OUT_TEST = malloc(alloc_size * sizeof(float));
   if (!OUT_TEST) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
-    fread(&OUT_TEST[i], sizeof(float), 1, out_f);
+    fscanf(out_f, "%f", &(OUT_TEST[i]));
   }
   fclose(out_f);
 
@@ -80,20 +93,13 @@ int main(int argc, char** argv) {
   float * W = malloc( alloc_size * sizeof(float));
   if (!W) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
-    fread(&W[i], sizeof(float), 1, weight_f);
+    W[i] = weight[i];
   }
-  fclose(weight_f);
 
   printf("Input size  = %d\n", IN_WIDTH*IN_HEIGHT*IN_DEPTH );
   printf("Weight size = %d\n", WEIGHT_WIDTH*WEIGHT_HEIGHT*WEIGHT_DEPTH*K_WEIGHTS );
   printf("Bias size   = %d\n", OUT_HEIGHT );
   printf("Input out test = %d\n\n", OUT_HEIGHT );
-
-  FILE * test;
-  test = fopen("TEST_BIAS_C.txt", "w");
-  for( i = 0; i < OUT_HEIGHT; ++i) {
-    fprintf(test, "%.6f\n", BIAS[i]);
-  }
 
   // FULLY CONNECTED
   for ( o_y = 0; o_y < OUT_HEIGHT; o_y++) {
@@ -134,8 +140,8 @@ int main(int argc, char** argv) {
   free(W);
   free(IN);
   free(BIAS);
-  free(OUT_TEST);
   free(OUT);
+  free(OUT_TEST);
 
   return 0;
 }
