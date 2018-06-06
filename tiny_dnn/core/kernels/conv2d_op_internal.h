@@ -23,14 +23,15 @@ inline void conv2d_op_internal(const tensor_t &in_data,
   #ifdef PRINT_DEBUG
   printf("\n[conv2d_op_internal] Convolution Layer Operation (internal)\n");
 
-  printf("Layer Input (padded): %d x %d x %d \nLayer Output = %d x %d x %d \nOutput Area = %d \nFilter %d x %d \nBias = %ld\nElement stride = %d\nLine stride = %d\n",
+  printf("Layer Input (padded): %d x %d x %d, size = %ld\nLayer Output = %d x %d x %d, size = %ld\nFilter %d x %d \nBias = %ld\nElement stride = %d\nLine stride = %d\n",
   params.in_padded.width_,
   params.in_padded.height_,
   params.in.depth_,
+  in_data[0].size(),
   params.out.width_,
   params.out.height_,
   params.out.depth_,
-  params.out.area(),
+  out_data[0].size(),
   params.weight.width_,
   params.weight.height_,
   bias.size(),
@@ -121,7 +122,7 @@ inline void conv2d_op_internal(const tensor_t &in_data,
        },
        0);
 
-   //  if (in_data[0].size() == 154587 && out_data[0].size() == 290400 && bias.size() == 96 && W.size() == 34848) {
+   //  if (in_data[0].size() == 86400 && out_data[0].size() == 43264 && bias.size() == 256 && W.size() == 884736) {
    //
    //   std::ofstream fout_indata;
    //   fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
@@ -152,9 +153,9 @@ inline void conv2d_op_internal(const tensor_t &in_data,
    //   fout_bias.close();
    //
    // }
-   // else {
-   //   printf("FAILED FILE WRITING:\nIN SIZE = %ld\tOUT SIZE = %ld\tBIAS SIZE = %ld\tW SIZE = %ld\n", in_data[0].size(), out_data[0].size(), bias.size(), W.size());
-   // }
+   // // else {
+   // //   printf("FAILED FILE WRITING:\nIN SIZE = %ld\tOUT SIZE = %ld\tBIAS SIZE = %ld\tW SIZE = %ld\n", in_data[0].size(), out_data[0].size(), bias.size(), W.size());
+   // // }
 }
 
 /******************************************************************/

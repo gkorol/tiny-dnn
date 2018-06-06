@@ -66,23 +66,24 @@ inline void maxpool_op_internal(
     }
   });
 
-  if (in_data[0].size() == 290400 && out_data[0].size() == 69984) {
-
-    std::ofstream fout_outdata;
-    fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
-    for( int i=0; i < out_data[0].size(); i++) {
-     fout_outdata << std::fixed << out_data[0][i] << std::endl;
-    }
-    fout_outdata.close();
-
-    std::ofstream fout_indata;
-    fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
-    for( int i=0; i < in_data[0].size(); i++) {
-      fout_indata << std::fixed << in_data[0][i] << std::endl;
-    }
-    fout_indata.close();
-
-  }
+  // // if (in_data[0].size() == 290400 && out_data[0].size() == 69984) {
+  // if (in_data[0].size() == 92256 && out_data[0].size() == 43264) {
+  //
+  //   std::ofstream fout_outdata;
+  //   fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
+  //   for( int i=0; i < out_data[0].size(); i++) {
+  //    fout_outdata << std::fixed << out_data[0][i] << std::endl;
+  //   }
+  //   fout_outdata.close();
+  //
+  //   std::ofstream fout_indata;
+  //   fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
+  //   for( int i=0; i < in_data[0].size(); i++) {
+  //     fout_indata << std::fixed << in_data[0][i] << std::endl;
+  //   }
+  //   fout_indata.close();
+  //
+  // }
 }
 
 inline void maxpool_grad_op_internal(

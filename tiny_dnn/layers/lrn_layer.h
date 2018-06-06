@@ -166,6 +166,24 @@ class lrn_layer : public layer {
         dst[j]             = src[j] *
                  std::pow(float_t(1) + alpha_div_size * in_square_[j], -beta_);
     }
+
+    // if (in.size() == 290400 && out.size() == 290400) {
+    //
+    //   std::ofstream fout_outdata;
+    //   fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
+    //   for( int i=0; i < out.size(); i++) {
+    //    fout_outdata << std::fixed << out[i] << std::endl;
+    //   }
+    //   fout_outdata.close();
+    //
+    //   std::ofstream fout_indata;
+    //   fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
+    //   for( int i=0; i < in.size(); i++) {
+    //     fout_indata << std::fixed << in[i] << std::endl;
+    //   }
+    //   fout_indata.close();
+    //
+    // }
   }
 
   void forward_within(const vec_t &in, vec_t &out) {
