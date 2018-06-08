@@ -18,6 +18,9 @@
 #include "param_headers/5_weight.h"
 #include "param_headers/5_bias.h"
 
+// #include "param_headers/6_weight.h"
+// #include "param_headers/6_bias.h"
+
 /******* Layer Conv 1 ********/
 #define FILTER_HEIGHT_1    11
 #define FILTER_WIDTH_1     11
@@ -92,6 +95,15 @@
 #define STRIDE_MAX_5      2
 #define STRIDE_CONV_5     1
 #define POOL_SIZE_5       3
+/*****************************/
+
+/******* Layer FC 6 ********/
+#define IN_HEIGHT_6 6
+#define IN_WIDTH_6  6
+#define IN_DEPTH_6  256
+#define OUT_HEIGHT_6 4096
+#define OUT_WIDTH_6  1
+#define OUT_DEPTH_6  1
 /*****************************/
 
 void conv(float in[], float weights[], float bias[], float out[],
@@ -196,7 +208,9 @@ void sub_square_sum(float in[], float out[], const unsigned size) {
   for (i = 0; i < size; i++) out[i] -= in[i] * in[i];
 }
 
-void lrn(float in[], float out[], const unsigned ih, const unsigned iw, const unsigned id) {
+void lrn(float in[], float out[],
+  const unsigned ih, const unsigned iw, const unsigned id) {
+
   unsigned size_ = 5;             // Alexnet defined
   float alpha_ = 0.000100;        // Alexnet defined
   float beta_  = 0.750000;        // Alexnet defined
@@ -256,6 +270,23 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
         out[out_idx] = max;
       }
     }
+  }
+
+}
+
+void fc(float in[], float weights[], float bias[], float out[],
+  const unsigned ih, const unsigned iw, const unsigned id,
+  const unsigned oh, const unsigned ow, const unsigned od ){
+
+  unsigned o_y, i_s;
+  unsigned in_size = ih*iw*id;
+
+  for ( o_y = 0; o_y < oh; o_y++) {
+    out[o_y] = 0.0;
+    for ( i_s = 0; i_s < in_size; i_s++) {
+      out[o_y] += in[i_s] * weights[i_s * oh + o_y];
+    }
+    out[o_y] += bias[o_y];
   }
 
 }
@@ -415,7 +446,7 @@ int main(int argc, char** argv) {
   alloc_size = OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5;
   float * out_5 = malloc(alloc_size * sizeof(float));
   if (!out_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // Inicializa out_4
+  // Inicializa out_5
   for( i = 0; i < OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5; ++i) {
     out_5[i] = 0.0;
   }
@@ -441,6 +472,13 @@ int main(int argc, char** argv) {
   free(out_5);
 
   /******************************** Layer 6 ***********************************/
+  // alloc_size = OUT_HEIGHT_6*OUT_WIDTH_6*OUT_DEPTH_6;
+  // float * out_6 = malloc(alloc_size * sizeof(float));
+  // if (!out_6) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // fc(out_pool_5, weight_6, bias_6,
+  //   OUT_HEIGHT_6, OUT_WIDTH_6, OUT_DEPTH_6,
+  //   OUT_HEIGHT_5, OUT_WIDTH_5, OUT_DEPTH_5,);
+
 
   /******************************** Layer 7 ***********************************/
 
