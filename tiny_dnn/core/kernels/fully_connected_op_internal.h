@@ -58,12 +58,12 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
 
   if (in_data[0].size() == 9216 && out_data[0].size() == 4096 && bias.size() == 4096 && W.size() == 37748736) {
 
-    std::ofstream fout_indata;
-    fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
-    for( int i=0; i < in_data[0].size(); i++) {
-      fout_indata << std::fixed << in_data[0][i] << std::endl;
-    }
-    fout_indata.close();
+    // std::ofstream fout_indata;
+    // fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
+    // for( int i=0; i < in_data[0].size(); i++) {
+    //   fout_indata << std::fixed << in_data[0][i] << std::endl;
+    // }
+    // fout_indata.close();
 
     // std::ofstream fout_outdata;
     // fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);

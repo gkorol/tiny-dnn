@@ -7,36 +7,36 @@
 import sys
 
 if len(sys.argv) < 6:
-    print("Too few arguments. < HEIGHT > < WIDTH > < DEPTH > < array name > < text file in > < prefix name file out >")
+    print("Too few arguments. < F_HEIGHT > < F_WIDTH > < DEPTH > < HEIGHT > < array name > < text file in > < prefix name file out >")
     exit()
 
 height = int(sys.argv[1])
 width  = int(sys.argv[2])
 depth  = int(sys.argv[3])
+height_out  = int(sys.argv[4])
+array = sys.argv[5]
+file_r = open(sys.argv[6],"r")
+fileout_name = sys.argv[7]
+
 size = height * width * depth
-
-array = sys.argv[4]
-
-file_r = open(sys.argv[5],"r")
-file_w = open(sys.argv[6],"w")
-
-file_w.write("extern const float " + array + "[" + str(size) + "] = { \\\n")
-
+hxw = height * width
 i = 1
-last_line = 0
+n = 0
 
-for n in height:
-    file_w = open(sys.argv[6]+n+".h","w")
-    file_w.write("extern const float "+array+"_"+n+"["+str(size)+"] = { \\\n")
+# TODO...
 
-    for line in file_r:
-        in_line = line + last_line
-        if(i == size):
-            file_w.write(in_line.rstrip() + " };\n")
-        else:
-            file_w.write(in_line.rstrip() + ", \\\n")
-        i = i + 1
-        last_line = line
+for line in file_r:
+    if( hxw%i == 0 ):
+        n = n + 1
+        file_w.write("extern const float "+array+"_"+str(n)+"["+str(size)+"] = { \\\n")
+
+    if( i == size ):
+        file_w.write(line.rstrip() + " };\n")
+    else:
+        file_w.write(line.rstrip() + ", \\\n")
+
+    i = i + 1
+
 
 file_w.close()
 file_r.close()
