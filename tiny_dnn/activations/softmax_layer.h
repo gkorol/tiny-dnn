@@ -42,14 +42,14 @@ class softmax_layer : public activation_layer {
       y[j] /= denominator;
     }
 
-    if (x.size() == 1000 && y.size() == 1000) {
-      std::ofstream fout_outdata;
-      fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
-      for( int i=0; i < y.size(); i++) {
-       fout_outdata << std::fixed << y[i] << std::endl;
-      }
-      fout_outdata.close();
-    }
+    // if (x.size() == 1000 && y.size() == 1000) {
+    //   std::ofstream fout_outdata;
+    //   fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
+    //   for( int i=0; i < y.size(); i++) {
+    //    fout_outdata << std::fixed << y[i] << std::endl;
+    //   }
+    //   fout_outdata.close();
+    // }
 
   }
 

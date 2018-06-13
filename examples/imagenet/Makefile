@@ -61,3 +61,8 @@ net:
 # $ ./write_weights_n_files.py 6 6 256 4096 weights_6 transfer_files/FILTER_DATA.dat param_headers/weights_6/weights_6
 # $ ./write_weights_n_files.py 1 1 4096 4096 weights_7 transfer_files/FILTER_DATA.dat param_headers/weights_7/weights_7
 # $ ./write_weights_n_files.py 1 1 4096 1000 weights_8 transfer_files/FILTER_DATA.dat param_headers/weights_8/weights_8
+#
+# Linha para gerar histograma a partir do header de pesos
+# $ ./histogram.py 6 6 256 4096 param_headers/6_weight.h
+# $ ./histogram.py 1 1 4096 4096 param_headers/7_weight.h
+# $ ./histogram.py 1 1 4096 1000 param_headers/8_weight.h
