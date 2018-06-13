@@ -18,6 +18,20 @@ class softmax_layer : public activation_layer {
   std::string layer_type() const override { return "softmax-activation"; }
 
   void forward_activation(const vec_t &x, vec_t &y) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+     printf("[softmax/forward_propagation] Softmax Layer Operation\n");
+     printf("alpha = *std::max_element(x.begin(), x.end());\n");
+     printf("denominator = 0.0\n");
+     printf("\tFOR j = 0 : %ld {\n\
+     \t|\ty[j] = std::exp(x[j] - alpha);\n\
+     \t|\tdenominator += y[j];}\n\
+     \tFOR j = 0 : %ld {\n\
+       \t|\ty[j] /= denominator;}\n\
+     \t\n\n",
+          x.size(),x.size());
+    #endif
+
     const float_t alpha = *std::max_element(x.begin(), x.end());
     float_t denominator(0);
     for (serial_size_t j = 0; j < x.size(); j++) {
@@ -27,6 +41,16 @@ class softmax_layer : public activation_layer {
     for (serial_size_t j = 0; j < x.size(); j++) {
       y[j] /= denominator;
     }
+
+    if (x.size() == 1000 && y.size() == 1000) {
+      std::ofstream fout_outdata;
+      fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
+      for( int i=0; i < y.size(); i++) {
+       fout_outdata << std::fixed << y[i] << std::endl;
+      }
+      fout_outdata.close();
+    }
+
   }
 
   void backward_activation(const vec_t &x,

@@ -42,7 +42,9 @@ fc_sample:
 
 net:
 	rm -f fc_sample
-	gcc -Wall net.c -o net -lm
+	# gcc -Wall net.c -o net -lm
+	gcc net.c fc_6.c fc_7.c fc_8.c -o net -lm
+	# gcc net.c fc_6.c -o net -lm
 
 
 # NOTE
@@ -54,3 +56,8 @@ net:
 # $ ./write_array.py 227 227 3 in_1 transfer_files/IN_DATA.dat param_headers/1_in.h
 # $ ./write_array.py 121 3 96 weight_1 transfer_files/FILTER_DATA.dat param_headers/1_weight.h
 # $ ./write_array.py 1 1 96 bias_1 transfer_files/BIAS_DATA.dat param_headers/1_bias.h
+#
+# Linha para gerar multiplos .h a partir de um arq texto com pesos
+# $ ./write_weights_n_files.py 6 6 256 4096 weights_6 transfer_files/FILTER_DATA.dat param_headers/weights_6/weights_6
+# $ ./write_weights_n_files.py 1 1 4096 4096 weights_7 transfer_files/FILTER_DATA.dat param_headers/weights_7/weights_7
+# $ ./write_weights_n_files.py 1 1 4096 1000 weights_8 transfer_files/FILTER_DATA.dat param_headers/weights_8/weights_8

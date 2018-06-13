@@ -324,15 +324,19 @@ class sequential : public nodes {
     printf("[sequential/forward] For l in all nodes\n");
     #endif
     for (auto l : nodes_) {
-      // std::vector<layer *> nodes_;
       #ifdef PRINT_DEBUG
       printf("[sequential/forward] l->forward\n");
+      printf("[sequential/forward] l type = %s\n", (l->layer_type()).c_str());
       #endif
       l->forward();
     }
 
     const std::vector<tensor_t> out = nodes_.back()->output();
 
+    // Korol
+    #ifdef PRINT_DEBUG
+    printf("[sequential/forward] Finishing forward. Normalizing output\n");
+    #endif
     return normalize_out(out);
   }
 

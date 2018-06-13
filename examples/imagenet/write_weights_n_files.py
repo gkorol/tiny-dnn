@@ -19,24 +19,65 @@ file_r = open(sys.argv[6],"r")
 fileout_name = sys.argv[7]
 
 size = height * width * depth
-hxw = height * width
+
+lines = file_r.readlines()
+
+print len(lines)
+# Write all weights to headers
+# file_temp = open("temp_file","w")
+# for i in range(height_out):
+#     for j in range(size):
+#         file_temp.write(lines[j*height_out+i])
+#
+# file_temp.close()
+
+
+
+# file_r.close()
+# file_r = open("temp_file","r")
+
 i = 1
 n = 0
+t = 0
 
-# TODO...
+# file_w = open(fileout_name+"_"+str(n)+".h","w")
 
-for line in file_r:
-    if( hxw%i == 0 ):
-        n = n + 1
-        file_w.write("extern const float "+array+"_"+str(n)+"["+str(size)+"] = { \\\n")
+# Write all weights to headers
+# while True:
+#     line = file_r.readline()
+#     if not line:
+#         break
+#     if( i == 1 ):
+#         file_w = open(fileout_name+"_"+str(n)+".h","w")
+#         file_w.write("extern const float "+array+"_"+str(n)+"["+str(size)+"] = { \\\n")
+#         file_w.write(line.rstrip() + ", \\\n")
+#         n = n + 1
+#         i = i + 1
+#         # file_w.write(str(x) + ", \\\n")
+#         # print n
+#     elif( i == size ):
+#         file_w.write(line.rstrip() + " };\n")
+#         file_w.close()
+#         i = 1
+#     else:
+#         file_w.write(line.rstrip() + ", \\\n")
+#         i = i + 1
+#         # file_w.write(str(x) + ", \\\n")
 
-    if( i == size ):
-        file_w.write(line.rstrip() + " };\n")
-    else:
-        file_w.write(line.rstrip() + ", \\\n")
-
-    i = i + 1
+# # Write the include file for those headers
+# file_w = open(fileout_name+"_include_all.h","w")
+# for n in range(height_out):
+#     file_w.write("#include \""+fileout_name+"_"+str(n)+".h\"\n")
 
 
-file_w.close()
+# # Gera o .c
+file_w = open("fc_temp.c","w")
+for n in range(height_out):
+    file_w.write("out["+str(n)+"] = 0.0;\n")
+    file_w.write("for ( i_s = 0; i_s < in_size; i_s++) {\n")
+    file_w.write("out[" + str(n) + "] += in[i_s] * " + array + "_" + str(n) + "[i_s];\n")
+    file_w.write("}\n")
+    file_w.write("out["+str(n)+"] += bias["+str(n)+"];")
+    file_w.write("\n")
+
 file_r.close()

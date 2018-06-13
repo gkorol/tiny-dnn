@@ -44,9 +44,6 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
       out[i] = float_t{0};
       for (serial_size_t c = 0; c < params.in_size_; c++) {
         out[i] += W[c * params.out_size_ + i] * in[c];
-        // if(i==0) {
-        //   printf("%f = %f * %f\n", out[i],W[c * params.out_size_ + i],in[c]);
-        // }
       }
 
       if (params.has_bias_) {
@@ -56,7 +53,7 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
   });
 
 
-  if (in_data[0].size() == 9216 && out_data[0].size() == 4096 && bias.size() == 4096 && W.size() == 37748736) {
+  if (in_data[0].size() == 4096 && out_data[0].size() == 1000 && bias.size() == 1000 && W.size() == 4096000) {
 
     // std::ofstream fout_indata;
     // fout_indata.open("transfer_files/IN_DATA.dat", std::ios::out | std::ios::trunc);
@@ -72,7 +69,6 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
     // }
     // fout_outdata.close();
     //
-    // // Escreve pesos em arquivo binario
     // std::ofstream fout_filter;
     // fout_filter.open("transfer_files/FILTER_DATA.dat", std::ios::out | std::ios::trunc);
     // for( int i=0; i < W.size(); i++) {
@@ -80,7 +76,6 @@ inline void fully_connected_op_internal(const tensor_t &in_data,
     // }
     // fout_filter.close();
     //
-    // // Escreve biases em arquivo binario
     // std::ofstream fout_bias;
     // fout_bias.open("transfer_files/BIAS_DATA.dat", std::ios::out | std::ios::trunc);
     // for( int i=0; i < bias.size(); i++) {

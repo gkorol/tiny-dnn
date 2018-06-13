@@ -18,6 +18,11 @@ class tanh_layer : public activation_layer {
   std::string layer_type() const override { return "tanh-activation"; }
 
   void forward_activation(const vec_t &x, vec_t &y) override {
+    // Korol
+    #ifdef PRINT_DEBUG
+     printf("[tanh_layer/forward_propagation] TANH Layer Operation\n");
+    #endif
+
     for (serial_size_t j = 0; j < x.size(); j++) {
       y[j] = std::tanh(x[j]);
     }

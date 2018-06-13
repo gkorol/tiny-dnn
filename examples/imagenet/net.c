@@ -18,8 +18,7 @@
 #include "param_headers/5_weight.h"
 #include "param_headers/5_bias.h"
 
-// #include "param_headers/6_weight.h"
-// #include "param_headers/6_bias.h"
+#include "fc_include.h"
 
 /******* Layer Conv 1 ********/
 #define FILTER_HEIGHT_1    11
@@ -98,12 +97,30 @@
 /*****************************/
 
 /******* Layer FC 6 ********/
-#define IN_HEIGHT_6 6
-#define IN_WIDTH_6  6
-#define IN_DEPTH_6  256
+#define IN_HEIGHT_6  6
+#define IN_WIDTH_6   6
+#define IN_DEPTH_6   256
 #define OUT_HEIGHT_6 4096
 #define OUT_WIDTH_6  1
 #define OUT_DEPTH_6  1
+/*****************************/
+
+/******* Layer FC 7 ********/
+#define IN_HEIGHT_7  4096
+#define IN_WIDTH_7   1
+#define IN_DEPTH_7   1
+#define OUT_HEIGHT_7 4096
+#define OUT_WIDTH_7  1
+#define OUT_DEPTH_7  1
+/*****************************/
+
+/******* Layer FC 8 ********/
+#define IN_HEIGHT_8  4096
+#define IN_WIDTH_8   1
+#define IN_DEPTH_8   1
+#define OUT_HEIGHT_8 1000
+#define OUT_WIDTH_8  1
+#define OUT_DEPTH_8  1
 /*****************************/
 
 void conv(float in[], float weights[], float bias[], float out[],
@@ -170,6 +187,29 @@ void relu(float in[], const unsigned ih, const unsigned iw, const unsigned id) {
     if(in[i] < 0.0){
       in[i] = 0.0;
     }
+  }
+}
+
+void softmax(float in[], float out [],
+  const unsigned ih, const unsigned iw, const unsigned id) {
+
+  unsigned size = ih * iw * id;
+  unsigned i;
+  float denominator = 0.0;
+
+  float alpha = in[0];
+  for( i=1; i < size; ++i) {
+    if(in[i] > alpha)
+      alpha = in[i];
+  }
+
+  for( i=0; i < size; ++i) {
+    out[i] = exp(in[i] - alpha);
+    denominator += out[i];
+  }
+
+  for( i=0; i < size; ++i) {
+    out[i] /= denominator;
   }
 }
 
@@ -274,22 +314,22 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
 
 }
 
-void fc(float in[], float weights[], float bias[], float out[],
-  const unsigned ih, const unsigned iw, const unsigned id,
-  const unsigned oh, const unsigned ow, const unsigned od ){
-
-  unsigned o_y, i_s;
-  unsigned in_size = ih*iw*id;
-
-  for ( o_y = 0; o_y < oh; o_y++) {
-    out[o_y] = 0.0;
-    for ( i_s = 0; i_s < in_size; i_s++) {
-      out[o_y] += in[i_s] * weights[i_s * oh + o_y];
-    }
-    out[o_y] += bias[o_y];
-  }
-
-}
+// void fc(float in[], float weights[], float bias[], float out[],
+//   const unsigned ih, const unsigned iw, const unsigned id,
+//   const unsigned oh, const unsigned ow, const unsigned od ){
+//
+//   unsigned o_y, i_s;
+//   unsigned in_size = ih*iw*id;
+//
+//   for ( o_y = 0; o_y < oh; o_y++) {
+//     out[o_y] = 0.0;
+//     for ( i_s = 0; i_s < in_size; i_s++) {
+//       out[o_y] += in[i_s] * weights[i_s * oh + o_y];
+//     }
+//     out[o_y] += bias[o_y];
+//   }
+//
+// }
 
 int main(int argc, char** argv) {
 
@@ -472,23 +512,47 @@ int main(int argc, char** argv) {
   free(out_5);
 
   /******************************** Layer 6 ***********************************/
-  // alloc_size = OUT_HEIGHT_6*OUT_WIDTH_6*OUT_DEPTH_6;
-  // float * out_6 = malloc(alloc_size * sizeof(float));
-  // if (!out_6) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // fc(out_pool_5, weight_6, bias_6,
-  //   OUT_HEIGHT_6, OUT_WIDTH_6, OUT_DEPTH_6,
-  //   OUT_HEIGHT_5, OUT_WIDTH_5, OUT_DEPTH_5,);
+  alloc_size = OUT_HEIGHT_6*OUT_WIDTH_6*OUT_DEPTH_6;
+  float * out_6 = malloc(alloc_size * sizeof(float));
+  if (!out_6) { perror("malloc failed"); exit(EXIT_FAILURE); };
 
+  fc_6(out_pool_5, out_6);
+
+  free(out_pool_5);
+
+  relu(out_6, OUT_HEIGHT_6, OUT_WIDTH_6, OUT_DEPTH_6);
 
   /******************************** Layer 7 ***********************************/
+  alloc_size = OUT_HEIGHT_7*OUT_WIDTH_7*OUT_DEPTH_7;
+  float * out_7 = malloc(alloc_size * sizeof(float));
+  if (!out_7) { perror("malloc failed"); exit(EXIT_FAILURE); };
 
+  fc_7(out_6, out_7);
+
+  free(out_6);
+
+  relu(out_7, OUT_HEIGHT_7, OUT_WIDTH_7, OUT_DEPTH_7);
   /******************************** Layer 8 ***********************************/
+  alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+  float * out_8 = malloc(alloc_size * sizeof(float));
+  if (!out_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
 
+  fc_8(out_7, out_8);
+
+  free(out_7);
+
+  alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+  float * soft_8 = malloc(alloc_size * sizeof(float));
+  if (!soft_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+  softmax(out_8, soft_8, OUT_HEIGHT_8, OUT_WIDTH_8, OUT_DEPTH_8);
+
+  free(out_8);
 
   /****************************** Comparison **********************************/
-  // FILE * out_f = fopen("transfer_files/OUT_DATA.dat","r");
-  FILE * out_f = fopen("transfer_files/IN_DATA.dat","r");
-  alloc_size = OUT_HEIGHT_5*OUT_WIDTH_5*OUT_DEPTH_5;
+  FILE * out_f = fopen("transfer_files/OUT_DATA.dat","r");
+  // FILE * out_f = fopen("transfer_files/IN_DATA.dat","r");
+  alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
   float * out_test = malloc(alloc_size * sizeof(float));
   if (!out_test) { perror("malloc failed"); exit(EXIT_FAILURE); };
   for (i=0; i < alloc_size; ++i){
@@ -500,21 +564,21 @@ int main(int argc, char** argv) {
   max = 0.0;
   i = 0;
 
-  for(o_x = 0; o_x < OUT_HEIGHT_5*OUT_WIDTH_5*OUT_DEPTH_5; ++o_x) {
+  for(o_x = 0; o_x < OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8; ++o_x) {
 
-    if ( out_pool_5[o_x]-out_test[o_x] < 0) {
-      error = -1.0 * (out_pool_5[o_x]-out_test[o_x]);
+    if ( soft_8[o_x]-out_test[o_x] < 0) {
+      error = -1.0 * (soft_8[o_x]-out_test[o_x]);
     } else {
-      error = out_pool_5[o_x]-out_test[o_x];
+      error = soft_8[o_x]-out_test[o_x];
     }
 
-    printf("out_pool_5[%4d] = %+2.6f | test[%4d] = %+2.6f ->\t %2.6f\n", o_x, out_pool_5[o_x], o_x, out_test[o_x], error);
+    printf("soft_8[%4d] = %+2.9f | test[%4d] = %+2.9f ->\t %2.9f\n", o_x, soft_8[o_x], o_x, out_test[o_x], error);
     if (error > max) {
       max = error;
     }
   }
 
-  printf("Max Error = %f\n", max);
+  printf("Max Error = %.9f\n", max);
 
   return  0;
 }

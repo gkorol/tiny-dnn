@@ -60,6 +60,13 @@ void recognize(const std::string &model_name,
   auto res = nn.predict(data);
   vector<pair<double, int>> scores;
 
+  // std::ofstream fout_outdata;
+  // fout_outdata.open("transfer_files/OUT_DATA_.dat", std::ios::out | std::ios::trunc);
+  // for( int i=0; i < 1000; i++) {
+  //  fout_outdata << std::fixed << res[i] << endl;
+  // }
+  // fout_outdata.close();
+
   // Load class labels
   ifstream class_labels_file(class_labels_file_name, ios::in);
   string line;
@@ -69,8 +76,10 @@ void recognize(const std::string &model_name,
   }
 
   // sort & print top-5
-  for (int i = 0; i < 1000; i++)
+  for (int i = 0; i < 1000; i++) {
     scores.emplace_back(rescale<tanh_layer>(res[i]), i);
+    // cout<<"< "<<scores[i].first<<" , "<<scores[i].second<<" >"<<endl;
+  }
 
   sort(scores.begin(), scores.end(), greater<pair<double, int>>());
 

@@ -26,6 +26,7 @@ class relu_layer : public activation_layer {
      \t\n\n",
           x.size());
     #endif
+    
     for (serial_size_t j = 0; j < x.size(); j++) {
       y[j] = std::max(float_t(0), x[j]);
     }

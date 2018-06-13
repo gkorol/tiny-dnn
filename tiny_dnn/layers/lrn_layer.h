@@ -138,10 +138,6 @@ class lrn_layer : public layer {
           size_ / 2, in_shape_.area());
     #endif
 
-    // void add_square_sum(const float_t *src, serial_size_t size, float_t *dst) {
-    //   for (serial_size_t i = 0; i < size; i++) dst[i] += src[i] * src[i];
-    // }
-
     for (serial_size_t i = 0; i < size_ / 2; i++) {
       serial_size_t idx = in_shape_.get_index(0, 0, i);
       add_square_sum(&in[idx], in_shape_.area(), &in_square_[0]);
