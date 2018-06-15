@@ -1,0 +1,483 @@
+[Main/recognize] Loading Model
+[network/load] Calling ifstream
+[network/load] Calling Cereal Binary input
+[network/from_archive] Calling load_model
+[network/from_archive] Loading model
+[nodes/load] Filling layers from ar
+[network/from_archive] Loaded model
+[network/from_archive] Loading weights
+[network/from_archive] Loaded weights
+[Main/recognize] Converting image
+[Main/recognize] Calling predict method
+[Network/fprop] Calling forward method
+[sequential/forward] Calling node forward
+[sequential/forward] For l in all nodes
+[sequential/forward] l->forward
+[sequential/forward] l type = conv
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[convolutional_layer/forward_propagation] Inside CONV layer forward prop
+[convolutional_layer/forward_propagation] Calling convolutional kernel
+[Conv2dOp/compute] Inside convolutional kernel
+[Conv2dOp/compute] Calling op internal
+
+[conv2d_op_internal] Convolution Layer Operation (internal)
+Layer Input (padded): 227 x 227 x 3, size = 154587
+Layer Output = 55 x 55 x 96, size = 290400
+Filter 11 x 11 
+Bias = 96
+Element stride = 4
+Line stride = 908
+FOR sample = r.begin() : r.end()
+         	FOR o = 0 : 96 
+         	|	FOR inc = 0 : 3 
+         	|	|	pin = in[in_padded.get_index(0, 0, inc)]
+         	|	|	pw  = W[weight.get_index(0, 0, id * o + inc)]
+         	|	|	FOR y = 0 : 55 
+         	|	|	|	pin_line = pin
+         	|	|	|	FOR x = 0 : 55 
+         	|	|	|	|	sum = 0
+         	|	|	|	|	pw_element = pin_line
+         	|	|	|	|	pin_element = pw
+         	|	|	|	|	FOR wx = 0 : 11 
+         	|	|	|	|	|	FOR wy = 0 : 11 
+         	|	|	|	|	|	|	sum += pw_element[wx] * pin_element[wx]
+         	|	|	|	|	|	pw_element += kw 
+         	|	|	|	|	|	pin_element += iw 
+         	|	|	|	|	pout[x] += sum 
+         	|	|	|	|	pin_line += elem_stride
+         	|	|	|	pout += ow 
+         	|	|	|	pin += line_stride
+         	|	vectorize::add(bias[o], out_area, pa)
+         
+
+[sequential/forward] l->forward
+[sequential/forward] l type = relu-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[relu_layer/forward_propagation] ReLU Layer Operation
+	FOR j = 0 : 290400
+     	|	y[j] = std::max(float_t(0), x[j])
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = lrn
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[lrn_layer/forward_propagation] Calling lrn_layer forward propagation
+[lrn_layer/forward_propagation] Calling lrn_layer forward forward_across
+[lrn_layer/forward_across] LRN Operation
+In size = 290400, Out size = 290400, size_ = 5, alpha = 0.000100, beta = 0.750000, in_square_ size = 3025
+	FOR i = 0 : 2
+     	|	idx = in_shape_.get_index(0, 0, i);
+     	|	add_square_sum(&in[idx], 3025, &in_square_[0]);
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = max-pool
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[max_pooling_layer/forward_propagation] Inside max_pooling_layer layer forward prop
+[MaxPoolOp/compute] Inside max pool kernel
+[MaxPoolOp/compute] Calling op internal
+[maxpool_op_internal] Pool size x = 3, Pool size y = 3, Stride x = 2, Stride y = 2
+[maxpool_op_internal] Max Pool Layer Operation (internal)
+Layer Input Size = 290400, Layer Output Size = 69984, MAX_IDX[0] size = 69984,   OUT2IN size = 69984, OUT2IN[0] size = 9
+	FOR i = 0 : 69984 (out2in.size)
+  	|	in_index = out2in[i] 
+  	|	max_value = numeric_limits::lowest 
+  	|	idx = 0 
+  	|	FOR j = 0 : 9 (all in_index) 
+  	|	|	if in[j] > max_value {
+    	|	|	|	max_value = in[j]
+    	|	|	|	idx = j }
+    	|	max[i] = idx
+    	|	out[i] = max_value
+    	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = conv
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[convolutional_layer/forward_propagation] Inside CONV layer forward prop
+[convolutional_layer/forward_propagation] Calling convolutional kernel
+[Conv2dOp/compute] Inside convolutional kernel
+[Conv2dOp/compute] Calling op internal
+
+[conv2d_op_internal] Convolution Layer Operation (internal)
+Layer Input (padded): 31 x 31 x 96, size = 92256
+Layer Output = 27 x 27 x 256, size = 186624
+Filter 5 x 5 
+Bias = 256
+Element stride = 1
+Line stride = 31
+FOR sample = r.begin() : r.end()
+         	FOR o = 0 : 256 
+         	|	FOR inc = 0 : 96 
+         	|	|	pin = in[in_padded.get_index(0, 0, inc)]
+         	|	|	pw  = W[weight.get_index(0, 0, id * o + inc)]
+         	|	|	FOR y = 0 : 27 
+         	|	|	|	pin_line = pin
+         	|	|	|	FOR x = 0 : 27 
+         	|	|	|	|	sum = 0
+         	|	|	|	|	pw_element = pin_line
+         	|	|	|	|	pin_element = pw
+         	|	|	|	|	FOR wx = 0 : 5 
+         	|	|	|	|	|	FOR wy = 0 : 5 
+         	|	|	|	|	|	|	sum += pw_element[wx] * pin_element[wx]
+         	|	|	|	|	|	pw_element += kw 
+         	|	|	|	|	|	pin_element += iw 
+         	|	|	|	|	pout[x] += sum 
+         	|	|	|	|	pin_line += elem_stride
+         	|	|	|	pout += ow 
+         	|	|	|	pin += line_stride
+         	|	vectorize::add(bias[o], out_area, pa)
+         
+
+[sequential/forward] l->forward
+[sequential/forward] l type = relu-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[relu_layer/forward_propagation] ReLU Layer Operation
+	FOR j = 0 : 186624
+     	|	y[j] = std::max(float_t(0), x[j])
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = lrn
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[lrn_layer/forward_propagation] Calling lrn_layer forward propagation
+[lrn_layer/forward_propagation] Calling lrn_layer forward forward_across
+[lrn_layer/forward_across] LRN Operation
+In size = 186624, Out size = 186624, size_ = 5, alpha = 0.000100, beta = 0.750000, in_square_ size = 729
+	FOR i = 0 : 2
+     	|	idx = in_shape_.get_index(0, 0, i);
+     	|	add_square_sum(&in[idx], 729, &in_square_[0]);
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = max-pool
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[max_pooling_layer/forward_propagation] Inside max_pooling_layer layer forward prop
+[MaxPoolOp/compute] Inside max pool kernel
+[MaxPoolOp/compute] Calling op internal
+[maxpool_op_internal] Pool size x = 3, Pool size y = 3, Stride x = 2, Stride y = 2
+[maxpool_op_internal] Max Pool Layer Operation (internal)
+Layer Input Size = 186624, Layer Output Size = 43264, MAX_IDX[0] size = 43264,   OUT2IN size = 43264, OUT2IN[0] size = 9
+	FOR i = 0 : 43264 (out2in.size)
+  	|	in_index = out2in[i] 
+  	|	max_value = numeric_limits::lowest 
+  	|	idx = 0 
+  	|	FOR j = 0 : 9 (all in_index) 
+  	|	|	if in[j] > max_value {
+    	|	|	|	max_value = in[j]
+    	|	|	|	idx = j }
+    	|	max[i] = idx
+    	|	out[i] = max_value
+    	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = conv
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[convolutional_layer/forward_propagation] Inside CONV layer forward prop
+[convolutional_layer/forward_propagation] Calling convolutional kernel
+[Conv2dOp/compute] Inside convolutional kernel
+[Conv2dOp/compute] Calling op internal
+
+[conv2d_op_internal] Convolution Layer Operation (internal)
+Layer Input (padded): 15 x 15 x 256, size = 57600
+Layer Output = 13 x 13 x 384, size = 64896
+Filter 3 x 3 
+Bias = 384
+Element stride = 1
+Line stride = 15
+FOR sample = r.begin() : r.end()
+         	FOR o = 0 : 384 
+         	|	FOR inc = 0 : 256 
+         	|	|	pin = in[in_padded.get_index(0, 0, inc)]
+         	|	|	pw  = W[weight.get_index(0, 0, id * o + inc)]
+         	|	|	FOR y = 0 : 13 
+         	|	|	|	pin_line = pin
+         	|	|	|	FOR x = 0 : 13 
+         	|	|	|	|	sum = 0
+         	|	|	|	|	pw_element = pin_line
+         	|	|	|	|	pin_element = pw
+         	|	|	|	|	FOR wx = 0 : 3 
+         	|	|	|	|	|	FOR wy = 0 : 3 
+         	|	|	|	|	|	|	sum += pw_element[wx] * pin_element[wx]
+         	|	|	|	|	|	pw_element += kw 
+         	|	|	|	|	|	pin_element += iw 
+         	|	|	|	|	pout[x] += sum 
+         	|	|	|	|	pin_line += elem_stride
+         	|	|	|	pout += ow 
+         	|	|	|	pin += line_stride
+         	|	vectorize::add(bias[o], out_area, pa)
+         
+
+[sequential/forward] l->forward
+[sequential/forward] l type = relu-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[relu_layer/forward_propagation] ReLU Layer Operation
+	FOR j = 0 : 64896
+     	|	y[j] = std::max(float_t(0), x[j])
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = conv
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[convolutional_layer/forward_propagation] Inside CONV layer forward prop
+[convolutional_layer/forward_propagation] Calling convolutional kernel
+[Conv2dOp/compute] Inside convolutional kernel
+[Conv2dOp/compute] Calling op internal
+
+[conv2d_op_internal] Convolution Layer Operation (internal)
+Layer Input (padded): 15 x 15 x 384, size = 86400
+Layer Output = 13 x 13 x 384, size = 64896
+Filter 3 x 3 
+Bias = 384
+Element stride = 1
+Line stride = 15
+FOR sample = r.begin() : r.end()
+         	FOR o = 0 : 384 
+         	|	FOR inc = 0 : 384 
+         	|	|	pin = in[in_padded.get_index(0, 0, inc)]
+         	|	|	pw  = W[weight.get_index(0, 0, id * o + inc)]
+         	|	|	FOR y = 0 : 13 
+         	|	|	|	pin_line = pin
+         	|	|	|	FOR x = 0 : 13 
+         	|	|	|	|	sum = 0
+         	|	|	|	|	pw_element = pin_line
+         	|	|	|	|	pin_element = pw
+         	|	|	|	|	FOR wx = 0 : 3 
+         	|	|	|	|	|	FOR wy = 0 : 3 
+         	|	|	|	|	|	|	sum += pw_element[wx] * pin_element[wx]
+         	|	|	|	|	|	pw_element += kw 
+         	|	|	|	|	|	pin_element += iw 
+         	|	|	|	|	pout[x] += sum 
+         	|	|	|	|	pin_line += elem_stride
+         	|	|	|	pout += ow 
+         	|	|	|	pin += line_stride
+         	|	vectorize::add(bias[o], out_area, pa)
+         
+
+[sequential/forward] l->forward
+[sequential/forward] l type = relu-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[relu_layer/forward_propagation] ReLU Layer Operation
+	FOR j = 0 : 64896
+     	|	y[j] = std::max(float_t(0), x[j])
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = conv
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[convolutional_layer/forward_propagation] Inside CONV layer forward prop
+[convolutional_layer/forward_propagation] Calling convolutional kernel
+[Conv2dOp/compute] Inside convolutional kernel
+[Conv2dOp/compute] Calling op internal
+
+[conv2d_op_internal] Convolution Layer Operation (internal)
+Layer Input (padded): 15 x 15 x 384, size = 86400
+Layer Output = 13 x 13 x 256, size = 43264
+Filter 3 x 3 
+Bias = 256
+Element stride = 1
+Line stride = 15
+FOR sample = r.begin() : r.end()
+         	FOR o = 0 : 256 
+         	|	FOR inc = 0 : 384 
+         	|	|	pin = in[in_padded.get_index(0, 0, inc)]
+         	|	|	pw  = W[weight.get_index(0, 0, id * o + inc)]
+         	|	|	FOR y = 0 : 13 
+         	|	|	|	pin_line = pin
+         	|	|	|	FOR x = 0 : 13 
+         	|	|	|	|	sum = 0
+         	|	|	|	|	pw_element = pin_line
+         	|	|	|	|	pin_element = pw
+         	|	|	|	|	FOR wx = 0 : 3 
+         	|	|	|	|	|	FOR wy = 0 : 3 
+         	|	|	|	|	|	|	sum += pw_element[wx] * pin_element[wx]
+         	|	|	|	|	|	pw_element += kw 
+         	|	|	|	|	|	pin_element += iw 
+         	|	|	|	|	pout[x] += sum 
+         	|	|	|	|	pin_line += elem_stride
+         	|	|	|	pout += ow 
+         	|	|	|	pin += line_stride
+         	|	vectorize::add(bias[o], out_area, pa)
+         
+
+[sequential/forward] l->forward
+[sequential/forward] l type = relu-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[relu_layer/forward_propagation] ReLU Layer Operation
+	FOR j = 0 : 43264
+     	|	y[j] = std::max(float_t(0), x[j])
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = max-pool
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[max_pooling_layer/forward_propagation] Inside max_pooling_layer layer forward prop
+[MaxPoolOp/compute] Inside max pool kernel
+[MaxPoolOp/compute] Calling op internal
+[maxpool_op_internal] Pool size x = 3, Pool size y = 3, Stride x = 2, Stride y = 2
+[maxpool_op_internal] Max Pool Layer Operation (internal)
+Layer Input Size = 43264, Layer Output Size = 9216, MAX_IDX[0] size = 9216,   OUT2IN size = 9216, OUT2IN[0] size = 9
+	FOR i = 0 : 9216 (out2in.size)
+  	|	in_index = out2in[i] 
+  	|	max_value = numeric_limits::lowest 
+  	|	idx = 0 
+  	|	FOR j = 0 : 9 (all in_index) 
+  	|	|	if in[j] > max_value {
+    	|	|	|	max_value = in[j]
+    	|	|	|	idx = j }
+    	|	max[i] = idx
+    	|	out[i] = max_value
+    	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = fully-connected
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[fully_connected_layer/forward_propagation] Inside FULLY CONNECTED layer forward prop
+[FullyConnectedOp/compute] Inside fully connected kernel
+[FullyConnectedOp/compute] Calling op internal
+[fully_connected_op_internal] Fully Connected Layer Operation (internal)
+Layer Input Size = 9216
+Layer Output Size = 4096
+Weights Size = 37748736
+Bias size = 4096
+	FOR i = 0 : 4096
+         	|	out[i] = 0
+         	|	FOR c = 0 : 9216
+         	|	|	out[i] += W[c * params.out_size_ + i] * in[c]
+         	|	out[i] += bias[i];
+         	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = relu-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[relu_layer/forward_propagation] ReLU Layer Operation
+	FOR j = 0 : 4096
+     	|	y[j] = std::max(float_t(0), x[j])
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = dropout
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[dropout_layer/forward_propagation] Inside DROPOUT forward propagation
+[sequential/forward] l->forward
+[sequential/forward] l type = fully-connected
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[fully_connected_layer/forward_propagation] Inside FULLY CONNECTED layer forward prop
+[FullyConnectedOp/compute] Inside fully connected kernel
+[FullyConnectedOp/compute] Calling op internal
+[fully_connected_op_internal] Fully Connected Layer Operation (internal)
+Layer Input Size = 4096
+Layer Output Size = 4096
+Weights Size = 16777216
+Bias size = 4096
+	FOR i = 0 : 4096
+         	|	out[i] = 0
+         	|	FOR c = 0 : 4096
+         	|	|	out[i] += W[c * params.out_size_ + i] * in[c]
+         	|	out[i] += bias[i];
+         	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = relu-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[relu_layer/forward_propagation] ReLU Layer Operation
+	FOR j = 0 : 4096
+     	|	y[j] = std::max(float_t(0), x[j])
+     	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = dropout
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[dropout_layer/forward_propagation] Inside DROPOUT forward propagation
+[sequential/forward] l->forward
+[sequential/forward] l type = fully-connected
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[fully_connected_layer/forward_propagation] Inside FULLY CONNECTED layer forward prop
+[FullyConnectedOp/compute] Inside fully connected kernel
+[FullyConnectedOp/compute] Calling op internal
+[fully_connected_op_internal] Fully Connected Layer Operation (internal)
+Layer Input Size = 4096
+Layer Output Size = 1000
+Weights Size = 4096000
+Bias size = 1000
+	FOR i = 0 : 1000
+         	|	out[i] = 0
+         	|	FOR c = 0 : 4096
+         	|	|	out[i] += W[c * params.out_size_ + i] * in[c]
+         	|	out[i] += bias[i];
+         	
+
+[sequential/forward] l->forward
+[sequential/forward] l type = softmax-activation
+[layer/forward] Forward internal to layer
+[layer/forward] Calling forward propagation (in_data -> out_data)
+[activation_layer/forward_propagation] Inside ACTIVATION layer forward prop
+[activation_layer/forward_propagation] const tensor_t &x = *in_data[0]
+[activation_layer/forward_propagation] tensor_t &y       = *out_data[0]
+[activation_layer/forward_propagation] for_i(x.size(), [&](int i) { forward_activation(x[i], y[i]); });
+[softmax/forward_propagation] Softmax Layer Operation
+alpha = *std::max_element(x.begin(), x.end());
+denominator = 0.0
+	FOR j = 0 : 1000 {
+     	|	y[j] = std::exp(x[j] - alpha);
+     	|	denominator += y[j];}
+     	FOR j = 0 : 1000 {
+       	|	y[j] /= denominator;}
+     	
+
+[sequential/forward] Finishing forward. Normalizing output
+Predicted class: screen, CRT screen (782) | Confidence: 93.7447 %
+Predicted class: monitor (664) | Confidence: 59.7836 %
+Predicted class: television, television system (851) | Confidence: 55.0617 %
+Predicted class: desktop computer (527) | Confidence: 51.323 %
+Predicted class: microwave, microwave oven (651) | Confidence: 50.4223 %

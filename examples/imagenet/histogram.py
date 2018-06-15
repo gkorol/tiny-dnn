@@ -39,6 +39,7 @@ for line in file_r:
 
 print len(w)
 
-plt.hist(w, bins='auto')
-plt.title("Weight distribution with 'auto' bins")
+# plt.hist(w, bins='auto')
+plt.hist(w, 500)
+plt.title("Weight distribution with 500 bins")
 plt.show()

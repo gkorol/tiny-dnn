@@ -61,7 +61,7 @@ void recognize(const std::string &model_name,
   vector<pair<double, int>> scores;
 
   std::ofstream fout_outdata;
-  fout_outdata.open("transfer_files/OUT_DATA_.dat", std::ios::out | std::ios::trunc);
+  fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
   for( int i=0; i < 1000; i++) {
    fout_outdata << std::fixed << res[i] << endl;
   }

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "param_headers/1_weight.h"
 #include "param_headers/1_in.h"
+#include "param_headers/1_weight.h"
 #include "param_headers/1_bias.h"
 
 #include "param_headers/2_weight.h"
@@ -550,6 +550,11 @@ int main(int argc, char** argv) {
   free(out_8);
 
   /****************************** Comparison **********************************/
+  FILE * out_f_w = fopen("transfer_files/NET_OUT.dat","w");
+  // for (o_x = 0; o_x < OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8; o_x++) {
+  //   fprintf(out_f_w, "%f\n", soft_8[o_x]);
+  // }
+
   FILE * out_f = fopen("transfer_files/OUT_DATA.dat","r");
   // FILE * out_f = fopen("transfer_files/IN_DATA.dat","r");
   alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
@@ -565,6 +570,8 @@ int main(int argc, char** argv) {
   i = 0;
 
   for(o_x = 0; o_x < OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8; ++o_x) {
+
+    fprintf(out_f_w, "%f\n", soft_8[o_x]);
 
     if ( soft_8[o_x]-out_test[o_x] < 0) {
       error = -1.0 * (soft_8[o_x]-out_test[o_x]);

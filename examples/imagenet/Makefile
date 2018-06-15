@@ -24,7 +24,7 @@ clean:
 .PHONY: run
 
 run:
-	./alexnet tiny-model-alexnet classes.txt cat.jpg
+	./alexnet tiny-model-alexnet classes.txt imagens/slippers.jpg
 
 .PHONY: conv_sample
 
