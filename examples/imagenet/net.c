@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "param_headers/1_in.h"
+// #include "param_headers/1_in.h"
 #include "param_headers/1_weight.h"
 #include "param_headers/1_bias.h"
 
@@ -340,6 +340,16 @@ int main(int argc, char** argv) {
   float error;
   float max;
 
+  // PARA TESTES
+  FILE * out_i = fopen("transfer_files/IN_DATA.dat","r");
+  alloc_size = IN_HEIGHT_1*IN_WIDTH_1*IN_DEPTH_1;
+  float * in_1 = malloc(alloc_size * sizeof(float));
+  if (!in_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  for (i=0; i < alloc_size; ++i){
+   fscanf(out_i, "%f", &(in_1[i]));
+  }
+  fclose(out_i);
+
   /******************************** Layer 1 ***********************************/
   alloc_size = OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1;
   float * out_1 = malloc(alloc_size * sizeof(float));
@@ -354,6 +364,8 @@ int main(int argc, char** argv) {
     IN_HEIGHT_1, IN_WIDTH_1, IN_DEPTH_1,
     OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
     STRIDE_CONV_1);
+
+  free(in_1);
 
   relu(out_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
 

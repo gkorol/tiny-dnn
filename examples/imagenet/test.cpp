@@ -60,12 +60,12 @@ void recognize(const std::string &model_name,
   auto res = nn.predict(data);
   vector<pair<double, int>> scores;
 
-  std::ofstream fout_outdata;
-  fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
-  for( int i=0; i < 1000; i++) {
-   fout_outdata << std::fixed << res[i] << endl;
-  }
-  fout_outdata.close();
+  // std::ofstream fout_outdata;
+  // fout_outdata.open("transfer_files/OUT_DATA.dat", std::ios::out | std::ios::trunc);
+  // for( int i=0; i < 1000; i++) {
+  //  fout_outdata << std::fixed << res[i] << endl;
+  // }
+  // fout_outdata.close();
 
   // Load class labels
   ifstream class_labels_file(class_labels_file_name, ios::in);
