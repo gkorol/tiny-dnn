@@ -61,12 +61,14 @@ void recognize(const std::string &model_name,
   // auto res = nn.predict(data);
   vector<double> res;
   std::ifstream fin_outdata;
-  fin_outdata.open(src_outdata, std::ios::out | std::ios::trunc);
-  for( int i=0; i < 1000; i++) {
-    double temp;
-    fin_outdata >> temp;
-    res.push_back(temp);
-    cout << res[i] << endl;
+  fin_outdata.open(src_outdata, std::ios::in);
+  std::string l;
+  while (std::getline(fin_outdata, l)) {
+    std::istringstream iss(l);
+    double a;
+    if (!(iss >> a)) { break; } // error
+
+    res.push_back(a);
   }
   fin_outdata.close();
 

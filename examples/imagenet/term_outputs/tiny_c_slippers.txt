@@ -1,0 +1,16 @@
+[Main/recognize] Loading Model
+[network/load] Calling ifstream
+[network/load] Calling Cereal Binary input
+[network/from_archive] Calling load_model
+[network/from_archive] Loading model
+[nodes/load] Filling layers from ar
+[network/from_archive] Loaded model
+[network/from_archive] Loading weights
+[network/from_archive] Loaded weights
+[Main/recognize] Converting image
+[Main/recognize] Calling predict method
+Predicted class: joystick (613) | Confidence: 53.2335 %
+Predicted class: CD player (485) | Confidence: 53.0781 %
+Predicted class: piggy bank, penny bank (719) | Confidence: 52.4761 %
+Predicted class: ocarina, sweet potato (684) | Confidence: 52.4241 %
+Predicted class: cassette player (482) | Confidence: 52.4044 %
