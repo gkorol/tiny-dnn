@@ -33,7 +33,8 @@ void convert_image(const std::string &imagefilename,
 
 void recognize(const std::string &model_name,
                const std::string &class_labels_file_name,
-               const std::string &src_filename) {
+               const std::string &src_filename,
+               const std::string &src_outdata) {
   network<sequential> nn;
 
   // Korol
@@ -57,7 +58,18 @@ void recognize(const std::string &model_name,
   #ifdef PRINT_DEBUG
   cout << "[Main/recognize] Calling predict method" << endl;
   #endif
-  auto res = nn.predict(data);
+  // auto res = nn.predict(data);
+  vector<double> res;
+  std::ifstream fin_outdata;
+  fin_outdata.open(src_outdata, std::ios::out | std::ios::trunc);
+  for( int i=0; i < 1000; i++) {
+    double temp;
+    fin_outdata >> temp;
+    res.push_back(temp);
+    cout << res[i] << endl;
+  }
+  fin_outdata.close();
+
   vector<pair<double, int>> scores;
 
   // std::ofstream fout_outdata;
@@ -91,10 +103,12 @@ void recognize(const std::string &model_name,
 }
 
 int main(int argc, char **argv) {
-  if (argc != 4) {
+  // if (argc != 4) {
+  if (argc != 5) {
     cout << "Usage: " << argv[0]
          << " <Model file> <Classes label file> <Input image file>" << endl;
     return 0;
   }
-  recognize(argv[1], argv[2], argv[3]);
+  // recognize(argv[1], argv[2], argv[3]);
+  recognize(argv[1], argv[2], argv[3], argv[4]);
 }
