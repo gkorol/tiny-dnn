@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
   float error;
   float max;
 
-  out_f = fopen("transfer_files/OUT_DATA.dat","r");
+  // out_f = fopen("transfer_files/OUT_DATA.dat","r");
 
   size_t alloc_size;
   // Input/Output vectors
@@ -144,13 +144,13 @@ int main(int argc, char** argv) {
     BIAS[i] = bias_1[i];
   }
 
-  alloc_size = OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH;
-  float * OUT_TEST = malloc(alloc_size * sizeof(float));
-  if (!OUT_TEST) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  for (i=0; i < alloc_size; ++i){
-    fscanf(out_f, "%f", &(OUT_TEST[i]));
-  }
-  fclose(out_f);
+  // alloc_size = OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH;
+  // float * OUT_TEST = malloc(alloc_size * sizeof(float));
+  // if (!OUT_TEST) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // for (i=0; i < alloc_size; ++i){
+  //   fscanf(out_f, "%f", &(OUT_TEST[i]));
+  // }
+  // fclose(out_f);
 
   float * OUT = malloc(alloc_size * sizeof(float));
   if (!OUT) { perror("malloc failed"); exit(EXIT_FAILURE); };
@@ -180,25 +180,7 @@ int main(int argc, char** argv) {
 
     for ( i_s = 0; i_s < IN_DEPTH ; i_s++) {
 
-      // if( BIPARTITE && o_s < (OUT_DEPTH/2) ) {
-      //   if( i_s < (IN_DEPTH/2) ) {
-      //     // fprintf(test, "o_s = %d , i_s = %d -> 0\n", o_s, i_s);
-      //     break;
-      //   } else {
-      //     // fprintf(test, "o_s = %d , i_s = %d -> 1\n", o_s, i_s);
-      //     continue;
-      //   }
-      // } else if (BIPARTITE) {
-      //   if( i_s < (IN_DEPTH/2) ) {
-      //     // fprintf(test, "o_s = %d , i_s = %d -> 1\n", o_s, i_s);
-      //     continue;
-      //   } else {
-      //     // fprintf(test, "o_s = %d , i_s = %d -> 0\n", o_s, i_s);
-      //     break;
-      //   }
-      // }
-
-      filter_slice  = &W[ (o_s*FILTER_HEIGHT*FILTER_WIDTH*IN_DEPTH) + (i_s*FILTER_HEIGHT*FILTER_WIDTH) ]; //
+      filter_slice  = &W[ (o_s*FILTER_HEIGHT*FILTER_WIDTH*IN_DEPTH) + (i_s*FILTER_HEIGHT*FILTER_WIDTH) ];
       // Aponta para conjunto de filtros que gera cada slice de saida (0 ~ 95)
       in_slice = &IN[ i_s*IN_HEIGHT*IN_WIDTH ];
       // Aponta para slice da entrada (R G B)
@@ -219,8 +201,6 @@ int main(int argc, char** argv) {
 
           sum = 0.0;
           // Inicializa somatorio
-
-          // fprintf(test, "%3d %3d %3d %3d %3d\n", o_s, i_s, o_y, o_x, (o_s*FILTER_HEIGHT*FILTER_WIDTH*IN_DEPTH) + (i_s*FILTER_HEIGHT*FILTER_WIDTH));
 
           for ( f_y = 0; f_y < FILTER_HEIGHT; f_y++) {
             for ( f_x = 0; f_x < FILTER_WIDTH; f_x++) {
@@ -247,35 +227,43 @@ int main(int argc, char** argv) {
       }
     }
 
-    for(i = 0; i < OUT_HEIGHT*OUT_WIDTH; i++) {
-      out_slice[i] += BIAS[o_s];
-      // Soma bias no slice
-    }
+    // for(i = 0; i < OUT_HEIGHT*OUT_WIDTH; i++) {
+    //   out_slice[i] += BIAS[o_s];
+    //   // Soma bias no slice
+    // }
   }
 
-  error = 0.0;
-  max = 0.0;
-  i = 0;
+  FILE *out_file;
 
-  for( o_s = 0; o_s < OUT_DEPTH; ++o_s ) {
-    printf("OUTPUT SLICE %d\n", o_s);
-    for(o_x = 0; o_x < OUT_HEIGHT*OUT_WIDTH; ++o_x) {
+  out_file = fopen("conv_sample_out.txt","w");
 
-      i = o_s*OUT_HEIGHT*OUT_WIDTH + o_x;
-
-      if ( OUT[i]-OUT_TEST[i] < 0) {
-        error = -1.0 * (OUT[i]-OUT_TEST[i]);
-      } else {
-        error = OUT[i]-OUT_TEST[i];
-      }
-      printf("OUT[%4d] = %+2.6f | OUT_TEST[%4d] = %+2.6f -> %+2.6f\n", i, OUT[i], i, OUT_TEST[i], error);
-      if (error > max) {
-        max = error;
-      }
-    }
+  for(i = 0; i < (OUT_WIDTH*OUT_HEIGHT*OUT_DEPTH); i++) {
+    fprintf(out_file, "%f\n", OUT[i]);
   }
 
-  printf("Max Error = %f\n", max);
+  // error = 0.0;
+  // max = 0.0;
+  // i = 0;
+
+  // for( o_s = 0; o_s < OUT_DEPTH; ++o_s ) {
+  //   printf("OUTPUT SLICE %d\n", o_s);
+  //   for(o_x = 0; o_x < OUT_HEIGHT*OUT_WIDTH; ++o_x) {
+  //
+  //     i = o_s*OUT_HEIGHT*OUT_WIDTH + o_x;
+  //
+  //     if ( OUT[i]-OUT_TEST[i] < 0) {
+  //       error = -1.0 * (OUT[i]-OUT_TEST[i]);
+  //     } else {
+  //       error = OUT[i]-OUT_TEST[i];
+  //     }
+  //     printf("OUT[%4d] = %+2.6f | OUT_TEST[%4d] = %+2.6f -> %+2.6f\n", i, OUT[i], i, OUT_TEST[i], error);
+  //     if (error > max) {
+  //       max = error;
+  //     }
+  //   }
+  // }
+
+  // printf("Max Error = %f\n", max);
 
   return 0;
 }

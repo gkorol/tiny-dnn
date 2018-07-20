@@ -2,23 +2,23 @@
 #include <stdlib.h>
 #include <math.h>
 
-// #include "param_headers/1_in.h"
+#include "param_headers/1_in.h"
 #include "param_headers/1_weight.h"
 #include "param_headers/1_bias.h"
 
-#include "param_headers/2_weight.h"
-#include "param_headers/2_bias.h"
+// #include "param_headers/2_weight.h"
+// #include "param_headers/2_bias.h"
+//
+// #include "param_headers/3_weight.h"
+// #include "param_headers/3_bias.h"
+//
+// #include "param_headers/4_weight.h"
+// #include "param_headers/4_bias.h"
+//
+// #include "param_headers/5_weight.h"
+// #include "param_headers/5_bias.h"
 
-#include "param_headers/3_weight.h"
-#include "param_headers/3_bias.h"
-
-#include "param_headers/4_weight.h"
-#include "param_headers/4_bias.h"
-
-#include "param_headers/5_weight.h"
-#include "param_headers/5_bias.h"
-
-#include "fc_include.h"
+// #include "fc_include.h"
 
 /******* Layer Conv 1 ********/
 #define FILTER_HEIGHT_1    11
@@ -146,7 +146,8 @@ void conv(float in[], float weights[], float bias[], float out[],
 
   unsigned ls = s * ih;
 
-  for ( o_s = 0; o_s < od; o_s++) {
+  // for ( o_s = 0; o_s < od; o_s++) {
+  for ( o_s = 0; o_s < 1; o_s++) {
     out_slice = &out[ o_s * oh * ow ];
     for ( i_s = 0; i_s < id ; i_s++) {
       filter_slice  = &weights[ (o_s * kh * kw * id) + (i_s * kh * kw) ];
@@ -161,11 +162,13 @@ void conv(float in[], float weights[], float bias[], float out[],
           for ( f_y = 0; f_y < kh; f_y++) {
             for ( f_x = 0; f_x < kw; f_x++) {
               sum += f_el[f_x] * in_el[f_x];
+              // printf("%f = %f * %f [%d]\n", sum,f_el[f_x],in_el[f_x], f_x);
             }
             f_el += kw;
             in_el += iw;
           }
           o_line[o_x] += sum;
+          // printf("sum = %f\n", sum);
           in_line += s;
         }
         o_line += ow;
@@ -340,15 +343,15 @@ int main(int argc, char** argv) {
   float error;
   float max;
 
-  // PARA TESTES
-  FILE * out_i = fopen("transfer_files/IN_DATA.dat","r");
-  alloc_size = IN_HEIGHT_1*IN_WIDTH_1*IN_DEPTH_1;
-  float * in_1 = malloc(alloc_size * sizeof(float));
-  if (!in_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  for (i=0; i < alloc_size; ++i){
-   fscanf(out_i, "%f", &(in_1[i]));
-  }
-  fclose(out_i);
+  // // PARA TESTES
+  // FILE * out_i = fopen("transfer_files/IN_DATA.dat","r");
+  // alloc_size = IN_HEIGHT_1*IN_WIDTH_1*IN_DEPTH_1;
+  // float * in_1 = malloc(alloc_size * sizeof(float));
+  // if (!in_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // for (i=0; i < alloc_size; ++i){
+  //  fscanf(out_i, "%f", &(in_1[i]));
+  // }
+  // fclose(out_i);
 
   /******************************** Layer 1 ***********************************/
   alloc_size = OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1;
@@ -365,239 +368,244 @@ int main(int argc, char** argv) {
     OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
     STRIDE_CONV_1);
 
-  free(in_1);
+  // free(in_1);
 
-  relu(out_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
-
-  alloc_size = OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1;
-  float * out_lrn_1 = malloc(alloc_size * sizeof(float));
-  if (!out_lrn_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  lrn(out_1, out_lrn_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
-
-  free(out_1);
-
-  alloc_size = OUT_HEIGHT_1*OUT_WIDTH_1*OUT_DEPTH_1;
-  float * out_pool_1 = malloc(alloc_size * sizeof(float));
-  if (!out_pool_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  maxpool(out_lrn_1, out_pool_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
-          OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1,
-          STRIDE_MAX_1, POOL_SIZE_1);
-
-  free(out_lrn_1);
-
-  /******************************** Layer 2 ***********************************/
-  alloc_size = IN_HEIGHT_2*IN_WIDTH_2*IN_DEPTH_2;
-  float * in_2 = malloc(alloc_size * sizeof(float));
-  if (!in_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  pad(out_pool_1, in_2, OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1, PAD_IN_2);
-
-  free(out_pool_1);
-
-  alloc_size = OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2;
-  float * out_2 = malloc(alloc_size * sizeof(float));
-  if (!out_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // Inicializa out_2
-  for( i = 0; i < OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2; ++i) {
-    out_2[i] = 0.0;
-  }
-
-  conv(in_2, weight_2, bias_2, out_2,
-    FILTER_HEIGHT_2, FILTER_WIDTH_2,
-    IN_HEIGHT_2, IN_WIDTH_2, IN_DEPTH_2,
-    OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
-    STRIDE_CONV_2);
-
-  free(in_2);
-
-  relu(out_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2);
-
-  alloc_size = OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2;
-  float * out_lrn_2 = malloc(alloc_size * sizeof(float));
-  if (!out_lrn_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  lrn(out_2, out_lrn_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2);
-
-  free(out_2);
-
-  alloc_size = OUT_HEIGHT_2*OUT_WIDTH_2*OUT_DEPTH_2;
-  float * out_pool_2 = malloc(alloc_size * sizeof(float));
-  if (!out_pool_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  maxpool(out_lrn_2, out_pool_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
-          OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2,
-          STRIDE_MAX_2, POOL_SIZE_2);
-
-  free(out_lrn_2);
-
-  /******************************** Layer 3 ***********************************/
-  alloc_size = IN_HEIGHT_3*IN_WIDTH_3*IN_DEPTH_3;
-  float * in_3 = malloc(alloc_size * sizeof(float));
-  if (!in_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  pad(out_pool_2, in_3, OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2, PAD_IN_3);
-
-  free(out_pool_2);
-
-  alloc_size = OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3;
-  float * out_3 = malloc(alloc_size * sizeof(float));
-  if (!out_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // Inicializa out_3
-  for( i = 0; i < OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3; ++i) {
-    out_3[i] = 0.0;
-  }
-
-  conv(in_3, weight_3, bias_3, out_3,
-    FILTER_HEIGHT_3, FILTER_WIDTH_3,
-    IN_HEIGHT_3, IN_WIDTH_3, IN_DEPTH_3,
-    OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3,
-    STRIDE_CONV_3);
-
-  free(in_3);
-
-  relu(out_3, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3);
-
-  /******************************** Layer 4 ***********************************/
-  alloc_size = IN_HEIGHT_4*IN_WIDTH_4*IN_DEPTH_4;
-  float * in_4 = malloc(alloc_size * sizeof(float));
-  if (!in_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  pad(out_3, in_4, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3, PAD_IN_4);
-
-  free(out_3);
-
-  alloc_size = OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4;
-  float * out_4 = malloc(alloc_size * sizeof(float));
-  if (!out_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // Inicializa out_4
-  for( i = 0; i < OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4; ++i) {
-    out_4[i] = 0.0;
-  }
-
-  conv(in_4, weight_4, bias_4, out_4,
-    FILTER_HEIGHT_4, FILTER_WIDTH_4,
-    IN_HEIGHT_4, IN_WIDTH_4, IN_DEPTH_4,
-    OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4,
-    STRIDE_CONV_4);
-
-  free(in_4);
-
-  relu(out_4, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4);
-
-  /******************************** Layer 5 ***********************************/
-  alloc_size = IN_HEIGHT_5*IN_WIDTH_5*IN_DEPTH_5;
-  float * in_5 = malloc(alloc_size * sizeof(float));
-  if (!in_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  pad(out_4, in_5, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4, PAD_IN_5);
-
-  free(out_4);
-
-  alloc_size = OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5;
-  float * out_5 = malloc(alloc_size * sizeof(float));
-  if (!out_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // Inicializa out_5
-  for( i = 0; i < OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5; ++i) {
-    out_5[i] = 0.0;
-  }
-
-  conv(in_5, weight_5, bias_5, out_5,
-    FILTER_HEIGHT_5, FILTER_WIDTH_5,
-    IN_HEIGHT_5, IN_WIDTH_5, IN_DEPTH_5,
-    OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
-    STRIDE_CONV_5);
-
-  free(in_5);
-
-  relu(out_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5);
-
-  alloc_size = OUT_HEIGHT_5*OUT_WIDTH_5*OUT_DEPTH_5;
-  float * out_pool_5 = malloc(alloc_size * sizeof(float));
-  if (!out_pool_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  maxpool(out_5, out_pool_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
-          OUT_HEIGHT_5, OUT_WIDTH_5, OUT_DEPTH_5,
-          STRIDE_MAX_5, POOL_SIZE_5);
-
-  free(out_5);
-
-  /******************************** Layer 6 ***********************************/
-  alloc_size = OUT_HEIGHT_6*OUT_WIDTH_6*OUT_DEPTH_6;
-  float * out_6 = malloc(alloc_size * sizeof(float));
-  if (!out_6) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  fc_6(out_pool_5, out_6);
-
-  free(out_pool_5);
-
-  relu(out_6, OUT_HEIGHT_6, OUT_WIDTH_6, OUT_DEPTH_6);
-
-  /******************************** Layer 7 ***********************************/
-  alloc_size = OUT_HEIGHT_7*OUT_WIDTH_7*OUT_DEPTH_7;
-  float * out_7 = malloc(alloc_size * sizeof(float));
-  if (!out_7) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  fc_7(out_6, out_7);
-
-  free(out_6);
-
-  relu(out_7, OUT_HEIGHT_7, OUT_WIDTH_7, OUT_DEPTH_7);
-  /******************************** Layer 8 ***********************************/
-  alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
-  float * out_8 = malloc(alloc_size * sizeof(float));
-  if (!out_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  fc_8(out_7, out_8);
-
-  free(out_7);
-
-  alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
-  float * soft_8 = malloc(alloc_size * sizeof(float));
-  if (!soft_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
-
-  softmax(out_8, soft_8, OUT_HEIGHT_8, OUT_WIDTH_8, OUT_DEPTH_8);
-
-  free(out_8);
-
-  /****************************** Comparison **********************************/
   FILE * out_f_w = fopen("transfer_files/NET_OUT.dat","w");
-  // for (o_x = 0; o_x < OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8; o_x++) {
-  //   fprintf(out_f_w, "%f\n", soft_8[o_x]);
+  for (o_x = 0; o_x < OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1; o_x++) {
+    fprintf(out_f_w, "%f\n", out_1[o_x]);
+  }
+
+  // relu(out_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
+  //
+  // alloc_size = OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1;
+  // float * out_lrn_1 = malloc(alloc_size * sizeof(float));
+  // if (!out_lrn_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // lrn(out_1, out_lrn_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
+  //
+  // free(out_1);
+  //
+  // alloc_size = OUT_HEIGHT_1*OUT_WIDTH_1*OUT_DEPTH_1;
+  // float * out_pool_1 = malloc(alloc_size * sizeof(float));
+  // if (!out_pool_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // maxpool(out_lrn_1, out_pool_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
+  //         OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1,
+  //         STRIDE_MAX_1, POOL_SIZE_1);
+  //
+  // free(out_lrn_1);
+  //
+  // /******************************** Layer 2 ***********************************/
+  // alloc_size = IN_HEIGHT_2*IN_WIDTH_2*IN_DEPTH_2;
+  // float * in_2 = malloc(alloc_size * sizeof(float));
+  // if (!in_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // pad(out_pool_1, in_2, OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1, PAD_IN_2);
+  //
+  // free(out_pool_1);
+  //
+  // alloc_size = OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2;
+  // float * out_2 = malloc(alloc_size * sizeof(float));
+  // if (!out_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // // Inicializa out_2
+  // for( i = 0; i < OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2; ++i) {
+  //   out_2[i] = 0.0;
   // }
-
-  FILE * out_f = fopen("transfer_files/OUT_DATA.dat","r");
-  // FILE * out_f = fopen("transfer_files/IN_DATA.dat","r");
-  alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
-  float * out_test = malloc(alloc_size * sizeof(float));
-  if (!out_test) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  for (i=0; i < alloc_size; ++i){
-   fscanf(out_f, "%f", &(out_test[i]));
-  }
-  fclose(out_f);
-
-  error = 0.0;
-  max = 0.0;
-  i = 0;
-
-  for(o_x = 0; o_x < OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8; ++o_x) {
-
-    fprintf(out_f_w, "%f\n", soft_8[o_x]);
-
-    if ( soft_8[o_x]-out_test[o_x] < 0) {
-      error = -1.0 * (soft_8[o_x]-out_test[o_x]);
-    } else {
-      error = soft_8[o_x]-out_test[o_x];
-    }
-
-    printf("soft_8[%4d] = %+2.9f | test[%4d] = %+2.9f ->\t %2.9f\n", o_x, soft_8[o_x], o_x, out_test[o_x], error);
-    if (error > max) {
-      max = error;
-    }
-  }
-
-  printf("Max Error = %.9f\n", max);
+  //
+  // conv(in_2, weight_2, bias_2, out_2,
+  //   FILTER_HEIGHT_2, FILTER_WIDTH_2,
+  //   IN_HEIGHT_2, IN_WIDTH_2, IN_DEPTH_2,
+  //   OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
+  //   STRIDE_CONV_2);
+  //
+  // free(in_2);
+  //
+  // relu(out_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2);
+  //
+  // alloc_size = OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2;
+  // float * out_lrn_2 = malloc(alloc_size * sizeof(float));
+  // if (!out_lrn_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // lrn(out_2, out_lrn_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2);
+  //
+  // free(out_2);
+  //
+  // alloc_size = OUT_HEIGHT_2*OUT_WIDTH_2*OUT_DEPTH_2;
+  // float * out_pool_2 = malloc(alloc_size * sizeof(float));
+  // if (!out_pool_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // maxpool(out_lrn_2, out_pool_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
+  //         OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2,
+  //         STRIDE_MAX_2, POOL_SIZE_2);
+  //
+  // free(out_lrn_2);
+  //
+  // /******************************** Layer 3 ***********************************/
+  // alloc_size = IN_HEIGHT_3*IN_WIDTH_3*IN_DEPTH_3;
+  // float * in_3 = malloc(alloc_size * sizeof(float));
+  // if (!in_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // pad(out_pool_2, in_3, OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2, PAD_IN_3);
+  //
+  // free(out_pool_2);
+  //
+  // alloc_size = OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3;
+  // float * out_3 = malloc(alloc_size * sizeof(float));
+  // if (!out_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // // Inicializa out_3
+  // for( i = 0; i < OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3; ++i) {
+  //   out_3[i] = 0.0;
+  // }
+  //
+  // conv(in_3, weight_3, bias_3, out_3,
+  //   FILTER_HEIGHT_3, FILTER_WIDTH_3,
+  //   IN_HEIGHT_3, IN_WIDTH_3, IN_DEPTH_3,
+  //   OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3,
+  //   STRIDE_CONV_3);
+  //
+  // free(in_3);
+  //
+  // relu(out_3, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3);
+  //
+  // /******************************** Layer 4 ***********************************/
+  // alloc_size = IN_HEIGHT_4*IN_WIDTH_4*IN_DEPTH_4;
+  // float * in_4 = malloc(alloc_size * sizeof(float));
+  // if (!in_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // pad(out_3, in_4, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3, PAD_IN_4);
+  //
+  // free(out_3);
+  //
+  // alloc_size = OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4;
+  // float * out_4 = malloc(alloc_size * sizeof(float));
+  // if (!out_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // // Inicializa out_4
+  // for( i = 0; i < OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4; ++i) {
+  //   out_4[i] = 0.0;
+  // }
+  //
+  // conv(in_4, weight_4, bias_4, out_4,
+  //   FILTER_HEIGHT_4, FILTER_WIDTH_4,
+  //   IN_HEIGHT_4, IN_WIDTH_4, IN_DEPTH_4,
+  //   OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4,
+  //   STRIDE_CONV_4);
+  //
+  // free(in_4);
+  //
+  // relu(out_4, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4);
+  //
+  // /******************************** Layer 5 ***********************************/
+  // alloc_size = IN_HEIGHT_5*IN_WIDTH_5*IN_DEPTH_5;
+  // float * in_5 = malloc(alloc_size * sizeof(float));
+  // if (!in_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // pad(out_4, in_5, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4, PAD_IN_5);
+  //
+  // free(out_4);
+  //
+  // alloc_size = OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5;
+  // float * out_5 = malloc(alloc_size * sizeof(float));
+  // if (!out_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // // Inicializa out_5
+  // for( i = 0; i < OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5; ++i) {
+  //   out_5[i] = 0.0;
+  // }
+  //
+  // conv(in_5, weight_5, bias_5, out_5,
+  //   FILTER_HEIGHT_5, FILTER_WIDTH_5,
+  //   IN_HEIGHT_5, IN_WIDTH_5, IN_DEPTH_5,
+  //   OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
+  //   STRIDE_CONV_5);
+  //
+  // free(in_5);
+  //
+  // relu(out_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5);
+  //
+  // alloc_size = OUT_HEIGHT_5*OUT_WIDTH_5*OUT_DEPTH_5;
+  // float * out_pool_5 = malloc(alloc_size * sizeof(float));
+  // if (!out_pool_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // maxpool(out_5, out_pool_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
+  //         OUT_HEIGHT_5, OUT_WIDTH_5, OUT_DEPTH_5,
+  //         STRIDE_MAX_5, POOL_SIZE_5);
+  //
+  // free(out_5);
+  //
+  // /******************************** Layer 6 ***********************************/
+  // alloc_size = OUT_HEIGHT_6*OUT_WIDTH_6*OUT_DEPTH_6;
+  // float * out_6 = malloc(alloc_size * sizeof(float));
+  // if (!out_6) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // fc_6(out_pool_5, out_6);
+  //
+  // free(out_pool_5);
+  //
+  // relu(out_6, OUT_HEIGHT_6, OUT_WIDTH_6, OUT_DEPTH_6);
+  //
+  // /******************************** Layer 7 ***********************************/
+  // alloc_size = OUT_HEIGHT_7*OUT_WIDTH_7*OUT_DEPTH_7;
+  // float * out_7 = malloc(alloc_size * sizeof(float));
+  // if (!out_7) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // fc_7(out_6, out_7);
+  //
+  // free(out_6);
+  //
+  // relu(out_7, OUT_HEIGHT_7, OUT_WIDTH_7, OUT_DEPTH_7);
+  // /******************************** Layer 8 ***********************************/
+  // alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+  // float * out_8 = malloc(alloc_size * sizeof(float));
+  // if (!out_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // fc_8(out_7, out_8);
+  //
+  // free(out_7);
+  //
+  // alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+  // float * soft_8 = malloc(alloc_size * sizeof(float));
+  // if (!soft_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  //
+  // softmax(out_8, soft_8, OUT_HEIGHT_8, OUT_WIDTH_8, OUT_DEPTH_8);
+  //
+  // free(out_8);
+  //
+  // /****************************** Comparison **********************************/
+  // FILE * out_f_w = fopen("transfer_files/NET_OUT.dat","w");
+  // // for (o_x = 0; o_x < OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8; o_x++) {
+  // //   fprintf(out_f_w, "%f\n", soft_8[o_x]);
+  // // }
+  //
+  // FILE * out_f = fopen("transfer_files/OUT_DATA.dat","r");
+  // // FILE * out_f = fopen("transfer_files/IN_DATA.dat","r");
+  // alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+  // float * out_test = malloc(alloc_size * sizeof(float));
+  // if (!out_test) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // for (i=0; i < alloc_size; ++i){
+  //  fscanf(out_f, "%f", &(out_test[i]));
+  // }
+  // fclose(out_f);
+  //
+  // error = 0.0;
+  // max = 0.0;
+  // i = 0;
+  //
+  // for(o_x = 0; o_x < OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8; ++o_x) {
+  //
+  //   fprintf(out_f_w, "%f\n", soft_8[o_x]);
+  //
+  //   if ( soft_8[o_x]-out_test[o_x] < 0) {
+  //     error = -1.0 * (soft_8[o_x]-out_test[o_x]);
+  //   } else {
+  //     error = soft_8[o_x]-out_test[o_x];
+  //   }
+  //
+  //   printf("soft_8[%4d] = %+2.9f | test[%4d] = %+2.9f ->\t %2.9f\n", o_x, soft_8[o_x], o_x, out_test[o_x], error);
+  //   if (error > max) {
+  //     max = error;
+  //   }
+  // }
+  //
+  // printf("Max Error = %.9f\n", max);
 
   return  0;
 }

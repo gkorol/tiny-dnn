@@ -33,8 +33,12 @@ void convert_image(const std::string &imagefilename,
 
 void recognize(const std::string &model_name,
                const std::string &class_labels_file_name,
-               const std::string &src_filename,
-               const std::string &src_outdata) {
+               const std::string &src_filename) {
+
+// void recognize(const std::string &model_name,
+//                const std::string &class_labels_file_name,
+//                const std::string &src_filename,
+//                const std::string &src_outdata) {
   network<sequential> nn;
 
   // Korol
@@ -58,19 +62,19 @@ void recognize(const std::string &model_name,
   #ifdef PRINT_DEBUG
   cout << "[Main/recognize] Calling predict method" << endl;
   #endif
-  // auto res = nn.predict(data);
-  vector<double> res;
-  std::ifstream fin_outdata;
-  fin_outdata.open(src_outdata, std::ios::in);
-  std::string l;
-  while (std::getline(fin_outdata, l)) {
-    std::istringstream iss(l);
-    double a;
-    if (!(iss >> a)) { break; } // error
-
-    res.push_back(a);
-  }
-  fin_outdata.close();
+  auto res = nn.predict(data);
+  // vector<double> res;
+  // std::ifstream fin_outdata;
+  // fin_outdata.open(src_outdata, std::ios::in);
+  // std::string l;
+  // while (std::getline(fin_outdata, l)) {
+  //   std::istringstream iss(l);
+  //   double a;
+  //   if (!(iss >> a)) { break; } // error
+  //
+  //   res.push_back(a);
+  // }
+  // fin_outdata.close();
 
   vector<pair<double, int>> scores;
 
@@ -105,12 +109,12 @@ void recognize(const std::string &model_name,
 }
 
 int main(int argc, char **argv) {
-  // if (argc != 4) {
-  if (argc != 5) {
+  if (argc != 4) {
+  // if (argc != 5) {
     cout << "Usage: " << argv[0]
          << " <Model file> <Classes label file> <Input image file>" << endl;
     return 0;
   }
-  // recognize(argv[1], argv[2], argv[3]);
-  recognize(argv[1], argv[2], argv[3], argv[4]);
+  recognize(argv[1], argv[2], argv[3]);
+  // recognize(argv[1], argv[2], argv[3], argv[4]);
 }
