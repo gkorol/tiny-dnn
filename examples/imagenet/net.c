@@ -6,8 +6,8 @@
 #include "param_headers/1_weight.h"
 #include "param_headers/1_bias.h"
 
-// #include "param_headers/2_weight.h"
-// #include "param_headers/2_bias.h"
+#include "param_headers/2_weight.h"
+#include "param_headers/2_bias.h"
 //
 // #include "param_headers/3_weight.h"
 // #include "param_headers/3_bias.h"
@@ -146,8 +146,15 @@ void conv(float in[], float weights[], float bias[], float out[],
 
   unsigned ls = s * ih;
 
-  // for ( o_s = 0; o_s < od; o_s++) {
-  for ( o_s = 0; o_s < 1; o_s++) {
+  unsigned print_i = 0;
+
+  // if(od == OUT_DEPTH_2) {
+  //   for(o_x = 0; o_x < ih*iw; o_x++) {
+  //     printf("pad = %.6e\n", in[o_x]);
+  //   }
+  // }
+
+  for ( o_s = 0; o_s < od; o_s++) {
     out_slice = &out[ o_s * oh * ow ];
     for ( i_s = 0; i_s < id ; i_s++) {
       filter_slice  = &weights[ (o_s * kh * kw * id) + (i_s * kh * kw) ];
@@ -162,14 +169,27 @@ void conv(float in[], float weights[], float bias[], float out[],
           for ( f_y = 0; f_y < kh; f_y++) {
             for ( f_x = 0; f_x < kw; f_x++) {
               sum += f_el[f_x] * in_el[f_x];
-              // printf("%f = %f * %f [%d]\n", sum,f_el[f_x],in_el[f_x], f_x);
+              if (i_s == 0 && o_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
+                printf(" [%2d] = %.6e * %.6e\n", print_i++, in_el[f_x], f_el[f_x]);
+              }
             }
+            // if (i_s == 0 && o_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
+            //   printf("\n");
+            // }
             f_el += kw;
             in_el += iw;
           }
           o_line[o_x] += sum;
-          // printf("sum = %f\n", sum);
+          // if(o_s == 0 && i_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
+          if(i_s == 0 && o_s == 0 && od == OUT_DEPTH_2) {
+             printf("sum = %.6e\n", o_line[o_x]+bias[0]);
+             // printf("sum = %.6e\n",o_line[o_x]);
+          }
           in_line += s;
+          if (i_s == 0 && o_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
+            printf("\n");
+            print_i = 0;
+          }
         }
         o_line += ow;
         in_slice += ls;
@@ -178,6 +198,7 @@ void conv(float in[], float weights[], float bias[], float out[],
 
     for(o_x = 0; o_x < oh*ow; o_x++) {
       out_slice[o_x] += bias[o_s];
+      // if(o_s == 0) printf("sum = %f\n", out_slice[o_x]);
     }
   }
 }
@@ -297,6 +318,12 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
   unsigned in_idx, out_idx;
   float max;
 
+  // int i;
+  // for( i = 0; i < ih*iw; i++ ) {
+  //     printf("in[%d] = %f\n", i, in[i]);
+  // }
+  unsigned i_print = 0;
+
   for( k = 0; k < od; ++k) {
     for( y_o = 0; y_o < oh; y_o++ ) {
       for( x_o = 0; x_o < ow; x_o++ ) {
@@ -304,6 +331,11 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
         for( wy = 0; wy < ps; wy++ ) {
           for( wx = 0; wx < ps; wx++ ) {
             in_idx = (ih*k + (y_o*stride+wy)) * iw + (x_o*stride+wx);
+            // if(k == 0 && y_o == 3 && x_o == 9) {
+            // if(i_print == 59) {
+            //   printf("in[%d] = %f\n", in_idx, in[in_idx]);
+            //   // printf("%d - ", in_idx);
+            // }
             if(in[in_idx] > max) {
               max = in[in_idx];
             }
@@ -311,6 +343,12 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
         }
         out_idx = (oh*k + y_o) * ow + x_o;
         out[out_idx] = max;
+        // if(k == 0 && y_o == 3 && x_o == 9) {
+        // if(k == 0) {
+        // if(i_print == 59) {
+          // printf("max = %.6e\n", max);
+        // }
+        i_print++;
       }
     }
   }
@@ -370,12 +408,12 @@ int main(int argc, char** argv) {
 
   // free(in_1);
 
-  FILE * out_f_w = fopen("transfer_files/NET_OUT.dat","w");
-  for (o_x = 0; o_x < OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1; o_x++) {
-    fprintf(out_f_w, "%f\n", out_1[o_x]);
-  }
+  // FILE * out_f_w = fopen("transfer_files/NET_OUT.dat","w");
+  // for (o_x = 0; o_x < OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1; o_x++) {
+  //   fprintf(out_f_w, "%f\n", out_1[o_x]);
+  // }
 
-  // relu(out_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
+  relu(out_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
   //
   // alloc_size = OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1;
   // float * out_lrn_1 = malloc(alloc_size * sizeof(float));
@@ -385,39 +423,40 @@ int main(int argc, char** argv) {
   //
   // free(out_1);
   //
-  // alloc_size = OUT_HEIGHT_1*OUT_WIDTH_1*OUT_DEPTH_1;
-  // float * out_pool_1 = malloc(alloc_size * sizeof(float));
-  // if (!out_pool_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
+  alloc_size = OUT_HEIGHT_1*OUT_WIDTH_1*OUT_DEPTH_1;
+  float * out_pool_1 = malloc(alloc_size * sizeof(float));
+  if (!out_pool_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
   // maxpool(out_lrn_1, out_pool_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
-  //         OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1,
-  //         STRIDE_MAX_1, POOL_SIZE_1);
-  //
+  maxpool(out_1, out_pool_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
+          OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1,
+          STRIDE_MAX_1, POOL_SIZE_1);
+  free(out_1);
   // free(out_lrn_1);
   //
   // /******************************** Layer 2 ***********************************/
-  // alloc_size = IN_HEIGHT_2*IN_WIDTH_2*IN_DEPTH_2;
-  // float * in_2 = malloc(alloc_size * sizeof(float));
-  // if (!in_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  alloc_size = IN_HEIGHT_2*IN_WIDTH_2*IN_DEPTH_2;
+  float * in_2 = malloc(alloc_size * sizeof(float));
+  if (!in_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+  pad(out_pool_1, in_2, OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1, PAD_IN_2);
   //
-  // pad(out_pool_1, in_2, OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1, PAD_IN_2);
-  //
-  // free(out_pool_1);
-  //
-  // alloc_size = OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2;
-  // float * out_2 = malloc(alloc_size * sizeof(float));
-  // if (!out_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // // Inicializa out_2
-  // for( i = 0; i < OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2; ++i) {
-  //   out_2[i] = 0.0;
-  // }
-  //
-  // conv(in_2, weight_2, bias_2, out_2,
-  //   FILTER_HEIGHT_2, FILTER_WIDTH_2,
-  //   IN_HEIGHT_2, IN_WIDTH_2, IN_DEPTH_2,
-  //   OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
-  //   STRIDE_CONV_2);
-  //
+  free(out_pool_1);
+
+  alloc_size = OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2;
+  float * out_2 = malloc(alloc_size * sizeof(float));
+  if (!out_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // Inicializa out_2
+  for( i = 0; i < OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2; ++i) {
+    out_2[i] = 0.0;
+  }
+
+  conv(in_2, weight_2, bias_2, out_2,
+    FILTER_HEIGHT_2, FILTER_WIDTH_2,
+    IN_HEIGHT_2, IN_WIDTH_2, IN_DEPTH_2,
+    OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
+    STRIDE_CONV_2);
+
   // free(in_2);
   //
   // relu(out_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2);

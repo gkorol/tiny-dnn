@@ -42,8 +42,8 @@ fc_sample:
 
 net:
 	rm -f fc_sample
-	# gcc -Wall net.c -o net -lm
-	gcc net.c fc_6.c fc_7.c fc_8.c -o net -lm
+	gcc -Wall net.c -o net -lm
+	#gcc net.c fc_6.c fc_7.c fc_8.c -o net -lm
 	# gcc net.c fc_6.c -o net -lm
 
 
