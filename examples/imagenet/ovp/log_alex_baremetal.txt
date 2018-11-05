@@ -1,0 +1,51 @@
+IMPERAS Instruction Set Simulator (ISS)
+
+
+CpuManagerMulti (64-Bit) v20170201.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2017 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+CpuManagerMulti started: Mon Nov  5 15:25:48 2018
+
+
+Info (OP_AL) Found attribute symbol 'modelAttrs' in file '/soft64/imperas/ferramentas/64bits/Imperas.20170201/lib/Linux64/ImperasLib/arm.ovpworld.org/processor/arm/1.0/model.so'
+Info (OP_AL) Found attribute symbol 'modelAttrs' in file '/soft64/imperas/ferramentas/64bits/Imperas.20170201/lib/Linux64/ImperasLib/arm.ovpworld.org/semihosting/armNewlib/1.0/model.so'
+Info (OR_OF) Target 'iss/cpu0' has object file read from 'net_ovp.ARM7-O0-g.elf'
+Info (OR_PH) Program Headers:
+Info (OR_PH) Type           Offset     VirtAddr   PhysAddr   FileSiz    MemSiz     Flags Align
+Info (OR_PD) LOAD           0x00008000 0x00020000 0x00020000 0x0f081578 0x0f0815e4 RWE   8000
+Starting Alexnet
+CONV 1...
+CONV 2...
+CONV 3...
+CONV 4...
+CONV 5...
+FC 6...
+FC 7...
+FC 8...
+Info 
+Info ---------------------------------------------------
+Info CPU 'iss/cpu0_CPU0' STATISTICS
+Info   Type                  : arm (Cortex-A5MPx1)
+Info   Nominal MIPS          : 100
+Info   Final program counter : 0x20dc28
+Info   Simulated instructions: 116,112,600,621
+Info   Simulated MIPS        : 1404.7
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 1161.13 seconds
+Info   User time             : 82.63 seconds
+Info   System time           : 0.03 seconds
+Info   Elapsed time          : 82.66 seconds
+Info   Real time ratio       : 14.05x faster
+Info ---------------------------------------------------
+
+CpuManagerMulti finished: Mon Nov  5 15:27:11 2018
+
+
+CpuManagerMulti (64-Bit) v20170201.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
