@@ -1,3 +1,4 @@
+
 #mini makefile pra facilitar...
 
 CXX = g++
@@ -41,7 +42,7 @@ fc_sample:
 .PHONY: net
 
 net:
-	rm -f fc_sample
+	rm -f net
 	gcc -Wall net.c -o net -lm
 	#gcc net.c fc_6.c fc_7.c fc_8.c -o net -lm
 	# gcc net.c fc_6.c -o net -lm

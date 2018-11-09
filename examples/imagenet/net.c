@@ -8,15 +8,15 @@
 
 #include "param_headers/2_weight.h"
 #include "param_headers/2_bias.h"
-//
-// #include "param_headers/3_weight.h"
-// #include "param_headers/3_bias.h"
-//
-// #include "param_headers/4_weight.h"
-// #include "param_headers/4_bias.h"
-//
-// #include "param_headers/5_weight.h"
-// #include "param_headers/5_bias.h"
+
+#include "param_headers/3_weight.h"
+#include "param_headers/3_bias.h"
+
+#include "param_headers/4_weight.h"
+#include "param_headers/4_bias.h"
+
+#include "param_headers/5_weight.h"
+#include "param_headers/5_bias.h"
 
 // #include "fc_include.h"
 
@@ -30,7 +30,8 @@
 #define OUT_CONV_WIDTH_1   55
 #define OUT_HEIGHT_1       27
 #define OUT_WIDTH_1        27
-#define OUT_DEPTH_1        96
+// #define OUT_DEPTH_1        96
+#define OUT_DEPTH_1        2
 #define STRIDE_CONV_1      4
 #define STRIDE_MAX_1       2
 #define POOL_SIZE_1        3
@@ -42,12 +43,14 @@
 #define FILTER_WIDTH_2    5
 #define IN_HEIGHT_2       31
 #define IN_WIDTH_2        31
-#define IN_DEPTH_2        96
+// #define IN_DEPTH_2        96
+#define IN_DEPTH_2        2
 #define OUT_CONV_HEIGHT_2 27
 #define OUT_CONV_WIDTH_2  27
 #define OUT_HEIGHT_2      13
 #define OUT_WIDTH_2       13
-#define OUT_DEPTH_2       256
+// #define OUT_DEPTH_2       256
+#define OUT_DEPTH_2       3
 #define STRIDE_CONV_2     1
 #define STRIDE_MAX_2      2
 #define POOL_SIZE_2       3
@@ -59,10 +62,12 @@
 #define FILTER_WIDTH_3  3
 #define IN_HEIGHT_3     15
 #define IN_WIDTH_3      15
-#define IN_DEPTH_3      256
+// #define IN_DEPTH_3      256
+#define IN_DEPTH_3      3
 #define OUT_HEIGHT_3    13
 #define OUT_WIDTH_3     13
-#define OUT_DEPTH_3     384
+// #define OUT_DEPTH_3     384
+#define OUT_DEPTH_3     3
 #define STRIDE_CONV_3   1
 /*****************************/
 
@@ -72,10 +77,12 @@
 #define FILTER_WIDTH_4  3
 #define IN_HEIGHT_4     15
 #define IN_WIDTH_4      15
-#define IN_DEPTH_4      384
+// #define IN_DEPTH_4      384
+#define IN_DEPTH_4      3
 #define OUT_HEIGHT_4    13
 #define OUT_WIDTH_4     13
-#define OUT_DEPTH_4     384
+// #define OUT_DEPTH_4     384
+#define OUT_DEPTH_4     3
 #define STRIDE_CONV_4   1
 /*****************************/
 
@@ -85,12 +92,14 @@
 #define FILTER_WIDTH_5    3
 #define IN_HEIGHT_5       15
 #define IN_WIDTH_5        15
-#define IN_DEPTH_5        384
+// #define IN_DEPTH_5        384
+#define IN_DEPTH_5        3
 #define OUT_CONV_HEIGHT_5 13
 #define OUT_CONV_WIDTH_5  13
 #define OUT_HEIGHT_5      6
 #define OUT_WIDTH_5       6
-#define OUT_DEPTH_5       256
+// #define OUT_DEPTH_5       256
+#define OUT_DEPTH_5       3
 #define STRIDE_MAX_5      2
 #define STRIDE_CONV_5     1
 #define POOL_SIZE_5       3
@@ -123,10 +132,12 @@
 #define OUT_DEPTH_8  1
 /*****************************/
 
-void conv(float in[], float weights[], float bias[], float out[],
+#define DEBUG_LAYER 2
+
+void conv(const float in[], const float weights[], const float bias[], float out[],
   const unsigned kh, const unsigned kw, const unsigned ih, const unsigned iw,
   const unsigned id, const unsigned oh, const unsigned ow, const unsigned od,
-  const unsigned s){
+  const unsigned s, char layer){
 
   unsigned o_s;
   unsigned i_s;
@@ -148,12 +159,6 @@ void conv(float in[], float weights[], float bias[], float out[],
 
   unsigned print_i = 0;
 
-  // if(od == OUT_DEPTH_2) {
-  //   for(o_x = 0; o_x < ih*iw; o_x++) {
-  //     printf("pad = %.6e\n", in[o_x]);
-  //   }
-  // }
-
   for ( o_s = 0; o_s < od; o_s++) {
     out_slice = &out[ o_s * oh * ow ];
     for ( i_s = 0; i_s < id ; i_s++) {
@@ -169,8 +174,9 @@ void conv(float in[], float weights[], float bias[], float out[],
           for ( f_y = 0; f_y < kh; f_y++) {
             for ( f_x = 0; f_x < kw; f_x++) {
               sum += f_el[f_x] * in_el[f_x];
-              if (i_s == 0 && o_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
-                printf(" [%2d] = %.6e * %.6e\n", print_i++, in_el[f_x], f_el[f_x]);
+              if (layer == DEBUG_LAYER && i_s == 0 && o_s == 0 && o_x <= 1 && o_y <= 1) {
+                // printf(" [%2d] = %.6e * %.6e\n", print_i++, in_el[f_x], f_el[f_x]);
+                printf("[%2d] = %.6e\n", print_i++, in_el[f_x]);
               }
             }
             // if (i_s == 0 && o_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
@@ -180,14 +186,16 @@ void conv(float in[], float weights[], float bias[], float out[],
             in_el += iw;
           }
           o_line[o_x] += sum;
-          // if(o_s == 0 && i_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
-          if(i_s == 0 && o_s == 0 && od == OUT_DEPTH_2) {
-             printf("sum = %.6e\n", o_line[o_x]+bias[0]);
-             // printf("sum = %.6e\n",o_line[o_x]);
-          }
           in_line += s;
-          if (i_s == 0 && o_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
-            printf("\n");
+          // if(o_s == 0 && i_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
+          // if(layer == DEBUG_LAYER && i_s == 0 && o_s == 0 && o_x == 25 && o_y == 0) {
+          if(layer == DEBUG_LAYER) {
+             printf("sum_%d [%d][%d][%d][%d] = %.6e + %.6e (%.6e)\n",layer,o_s,i_s,o_x,o_y, sum,bias[o_s],o_line[o_x]+bias[o_s]);
+             // printf("sum_%d = %.6e\n",layer,o_line[o_x]+bias[o_s]);
+             print_i = 0;
+          }
+          if (layer == DEBUG_LAYER && i_s == 0 && o_s == 0 && o_x <= 1 && o_y <= 1) {
+            // printf("\n");
             print_i = 0;
           }
         }
@@ -198,7 +206,7 @@ void conv(float in[], float weights[], float bias[], float out[],
 
     for(o_x = 0; o_x < oh*ow; o_x++) {
       out_slice[o_x] += bias[o_s];
-      // if(o_s == 0) printf("sum = %f\n", out_slice[o_x]);
+      // if(layer == DEBUG_LAYER && o_s == 0) printf("sum_%d = %f\n", layer, out_slice[o_x]);
     }
   }
 }
@@ -311,7 +319,7 @@ void lrn(float in[], float out[],
 
 void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
   const unsigned id, const unsigned oh, const unsigned ow, const unsigned od,
-  const unsigned stride, const unsigned ps) {
+  const unsigned stride, const unsigned ps, char layer) {
   // Assuming input values above zero (in our case maxpool always come after a relu)
 
   unsigned x_o, y_o, k, wx, wy;
@@ -331,10 +339,9 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
         for( wy = 0; wy < ps; wy++ ) {
           for( wx = 0; wx < ps; wx++ ) {
             in_idx = (ih*k + (y_o*stride+wy)) * iw + (x_o*stride+wx);
-            // if(k == 0 && y_o == 3 && x_o == 9) {
-            // if(i_print == 59) {
-            //   printf("in[%d] = %f\n", in_idx, in[in_idx]);
-            //   // printf("%d - ", in_idx);
+            // if(layer == DEBUG_LAYER && k == 0 && x_o == 11 && y_o == 0) {
+            // // if(layer == DEBUG_LAYER) {
+            //   printf("in[%d] = %.6e\n", in_idx, in[in_idx]);
             // }
             if(in[in_idx] > max) {
               max = in[in_idx];
@@ -343,12 +350,12 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
         }
         out_idx = (oh*k + y_o) * ow + x_o;
         out[out_idx] = max;
-        // if(k == 0 && y_o == 3 && x_o == 9) {
-        // if(k == 0) {
-        // if(i_print == 59) {
-          // printf("max = %.6e\n", max);
-        // }
-        i_print++;
+       // if(layer == DEBUG_LAYER) {
+       // // if(layer == DEBUG_LAYER && k == 0 && (x_o == 21||x_o == 20) && y_o == 13) {
+       //   // printf("max_%d [%2d][%2d][%2d] = %.6e\n", layer, k, x_o, y_o, max);
+       //   printf("max_%d = %.6e\n", layer, max);
+       // }
+       i_print++;
       }
     }
   }
@@ -377,9 +384,9 @@ int main(int argc, char** argv) {
   size_t alloc_size;
 
   unsigned i;
-  unsigned o_x;
-  float error;
-  float max;
+  // unsigned o_x;
+  // float error;
+  // float max;
 
   // // PARA TESTES
   // FILE * out_i = fopen("transfer_files/IN_DATA.dat","r");
@@ -404,7 +411,7 @@ int main(int argc, char** argv) {
     FILTER_HEIGHT_1, FILTER_WIDTH_1,
     IN_HEIGHT_1, IN_WIDTH_1, IN_DEPTH_1,
     OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
-    STRIDE_CONV_1);
+    STRIDE_CONV_1, 1);
 
   // free(in_1);
 
@@ -430,11 +437,11 @@ int main(int argc, char** argv) {
   // maxpool(out_lrn_1, out_pool_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
   maxpool(out_1, out_pool_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
           OUT_HEIGHT_1, OUT_WIDTH_1, OUT_DEPTH_1,
-          STRIDE_MAX_1, POOL_SIZE_1);
+          STRIDE_MAX_1, POOL_SIZE_1, 1);
   free(out_1);
   // free(out_lrn_1);
-  //
-  // /******************************** Layer 2 ***********************************/
+
+  /******************************** Layer 2 ***********************************/
   alloc_size = IN_HEIGHT_2*IN_WIDTH_2*IN_DEPTH_2;
   float * in_2 = malloc(alloc_size * sizeof(float));
   if (!in_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
@@ -455,12 +462,12 @@ int main(int argc, char** argv) {
     FILTER_HEIGHT_2, FILTER_WIDTH_2,
     IN_HEIGHT_2, IN_WIDTH_2, IN_DEPTH_2,
     OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
-    STRIDE_CONV_2);
+    STRIDE_CONV_2, 2);
 
-  // free(in_2);
-  //
-  // relu(out_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2);
-  //
+  free(in_2);
+
+  relu(out_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2);
+
   // alloc_size = OUT_CONV_WIDTH_2*OUT_CONV_HEIGHT_2*OUT_DEPTH_2;
   // float * out_lrn_2 = malloc(alloc_size * sizeof(float));
   // if (!out_lrn_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
@@ -469,107 +476,109 @@ int main(int argc, char** argv) {
   //
   // free(out_2);
   //
-  // alloc_size = OUT_HEIGHT_2*OUT_WIDTH_2*OUT_DEPTH_2;
-  // float * out_pool_2 = malloc(alloc_size * sizeof(float));
-  // if (!out_pool_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
+  alloc_size = OUT_HEIGHT_2*OUT_WIDTH_2*OUT_DEPTH_2;
+  float * out_pool_2 = malloc(alloc_size * sizeof(float));
+  if (!out_pool_2) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
   // maxpool(out_lrn_2, out_pool_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
-  //         OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2,
-  //         STRIDE_MAX_2, POOL_SIZE_2);
-  //
+  maxpool(out_2, out_pool_2, OUT_CONV_HEIGHT_2, OUT_CONV_WIDTH_2, OUT_DEPTH_2,
+          OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2,
+          STRIDE_MAX_2, POOL_SIZE_2, 2);
+
+  free(out_2);
   // free(out_lrn_2);
-  //
-  // /******************************** Layer 3 ***********************************/
-  // alloc_size = IN_HEIGHT_3*IN_WIDTH_3*IN_DEPTH_3;
-  // float * in_3 = malloc(alloc_size * sizeof(float));
-  // if (!in_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
-  // pad(out_pool_2, in_3, OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2, PAD_IN_3);
-  //
-  // free(out_pool_2);
-  //
-  // alloc_size = OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3;
-  // float * out_3 = malloc(alloc_size * sizeof(float));
-  // if (!out_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // // Inicializa out_3
-  // for( i = 0; i < OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3; ++i) {
-  //   out_3[i] = 0.0;
-  // }
-  //
-  // conv(in_3, weight_3, bias_3, out_3,
-  //   FILTER_HEIGHT_3, FILTER_WIDTH_3,
-  //   IN_HEIGHT_3, IN_WIDTH_3, IN_DEPTH_3,
-  //   OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3,
-  //   STRIDE_CONV_3);
-  //
-  // free(in_3);
-  //
-  // relu(out_3, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3);
-  //
-  // /******************************** Layer 4 ***********************************/
-  // alloc_size = IN_HEIGHT_4*IN_WIDTH_4*IN_DEPTH_4;
-  // float * in_4 = malloc(alloc_size * sizeof(float));
-  // if (!in_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
-  // pad(out_3, in_4, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3, PAD_IN_4);
-  //
-  // free(out_3);
-  //
-  // alloc_size = OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4;
-  // float * out_4 = malloc(alloc_size * sizeof(float));
-  // if (!out_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // // Inicializa out_4
-  // for( i = 0; i < OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4; ++i) {
-  //   out_4[i] = 0.0;
-  // }
-  //
-  // conv(in_4, weight_4, bias_4, out_4,
-  //   FILTER_HEIGHT_4, FILTER_WIDTH_4,
-  //   IN_HEIGHT_4, IN_WIDTH_4, IN_DEPTH_4,
-  //   OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4,
-  //   STRIDE_CONV_4);
-  //
-  // free(in_4);
-  //
-  // relu(out_4, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4);
-  //
-  // /******************************** Layer 5 ***********************************/
-  // alloc_size = IN_HEIGHT_5*IN_WIDTH_5*IN_DEPTH_5;
-  // float * in_5 = malloc(alloc_size * sizeof(float));
-  // if (!in_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
-  // pad(out_4, in_5, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4, PAD_IN_5);
-  //
-  // free(out_4);
-  //
-  // alloc_size = OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5;
-  // float * out_5 = malloc(alloc_size * sizeof(float));
-  // if (!out_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // // Inicializa out_5
-  // for( i = 0; i < OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5; ++i) {
-  //   out_5[i] = 0.0;
-  // }
-  //
-  // conv(in_5, weight_5, bias_5, out_5,
-  //   FILTER_HEIGHT_5, FILTER_WIDTH_5,
-  //   IN_HEIGHT_5, IN_WIDTH_5, IN_DEPTH_5,
-  //   OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
-  //   STRIDE_CONV_5);
-  //
-  // free(in_5);
-  //
-  // relu(out_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5);
-  //
-  // alloc_size = OUT_HEIGHT_5*OUT_WIDTH_5*OUT_DEPTH_5;
-  // float * out_pool_5 = malloc(alloc_size * sizeof(float));
-  // if (!out_pool_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
-  // maxpool(out_5, out_pool_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
-  //         OUT_HEIGHT_5, OUT_WIDTH_5, OUT_DEPTH_5,
-  //         STRIDE_MAX_5, POOL_SIZE_5);
-  //
-  // free(out_5);
-  //
+
+  /******************************** Layer 3 ***********************************/
+  alloc_size = IN_HEIGHT_3*IN_WIDTH_3*IN_DEPTH_3;
+  float * in_3 = malloc(alloc_size * sizeof(float));
+  if (!in_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+  pad(out_pool_2, in_3, OUT_HEIGHT_2, OUT_WIDTH_2, OUT_DEPTH_2, PAD_IN_3);
+
+  free(out_pool_2);
+
+  alloc_size = OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3;
+  float * out_3 = malloc(alloc_size * sizeof(float));
+  if (!out_3) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // Inicializa out_3
+  for( i = 0; i < OUT_WIDTH_3*OUT_HEIGHT_3*OUT_DEPTH_3; ++i) {
+    out_3[i] = 0.0;
+  }
+
+  conv(in_3, weight_3, bias_3, out_3,
+    FILTER_HEIGHT_3, FILTER_WIDTH_3,
+    IN_HEIGHT_3, IN_WIDTH_3, IN_DEPTH_3,
+    OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3,
+    STRIDE_CONV_3, 3);
+
+  free(in_3);
+
+  relu(out_3, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3);
+
+  /******************************** Layer 4 ***********************************/
+  alloc_size = IN_HEIGHT_4*IN_WIDTH_4*IN_DEPTH_4;
+  float * in_4 = malloc(alloc_size * sizeof(float));
+  if (!in_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+  pad(out_3, in_4, OUT_HEIGHT_3, OUT_WIDTH_3, OUT_DEPTH_3, PAD_IN_4);
+
+  free(out_3);
+
+  alloc_size = OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4;
+  float * out_4 = malloc(alloc_size * sizeof(float));
+  if (!out_4) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // Inicializa out_4
+  for( i = 0; i < OUT_WIDTH_4*OUT_HEIGHT_4*OUT_DEPTH_4; ++i) {
+    out_4[i] = 0.0;
+  }
+
+  conv(in_4, weight_4, bias_4, out_4,
+    FILTER_HEIGHT_4, FILTER_WIDTH_4,
+    IN_HEIGHT_4, IN_WIDTH_4, IN_DEPTH_4,
+    OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4,
+    STRIDE_CONV_4, 4);
+
+  free(in_4);
+
+  relu(out_4, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4);
+
+  /******************************** Layer 5 ***********************************/
+  alloc_size = IN_HEIGHT_5*IN_WIDTH_5*IN_DEPTH_5;
+  float * in_5 = malloc(alloc_size * sizeof(float));
+  if (!in_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+  pad(out_4, in_5, OUT_HEIGHT_4, OUT_WIDTH_4, OUT_DEPTH_4, PAD_IN_5);
+
+  free(out_4);
+
+  alloc_size = OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5;
+  float * out_5 = malloc(alloc_size * sizeof(float));
+  if (!out_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
+  // Inicializa out_5
+  for( i = 0; i < OUT_CONV_WIDTH_5*OUT_CONV_HEIGHT_5*OUT_DEPTH_5; ++i) {
+    out_5[i] = 0.0;
+  }
+
+  conv(in_5, weight_5, bias_5, out_5,
+    FILTER_HEIGHT_5, FILTER_WIDTH_5,
+    IN_HEIGHT_5, IN_WIDTH_5, IN_DEPTH_5,
+    OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
+    STRIDE_CONV_5, 5);
+
+  free(in_5);
+
+  relu(out_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5);
+
+  alloc_size = OUT_HEIGHT_5*OUT_WIDTH_5*OUT_DEPTH_5;
+  float * out_pool_5 = malloc(alloc_size * sizeof(float));
+  if (!out_pool_5) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+  maxpool(out_5, out_pool_5, OUT_CONV_HEIGHT_5, OUT_CONV_WIDTH_5, OUT_DEPTH_5,
+          OUT_HEIGHT_5, OUT_WIDTH_5, OUT_DEPTH_5,
+          STRIDE_MAX_5, POOL_SIZE_5, 5);
+
+  free(out_5);
+
   // /******************************** Layer 6 ***********************************/
   // alloc_size = OUT_HEIGHT_6*OUT_WIDTH_6*OUT_DEPTH_6;
   // float * out_6 = malloc(alloc_size * sizeof(float));
