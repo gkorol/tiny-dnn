@@ -2,23 +2,23 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "param_headers/1_in.h"
-#include "param_headers/1_weight.h"
-#include "param_headers/1_bias.h"
+#include "../param_headers/1_in.h"
+#include "../param_headers/1_weight.h"
+#include "../param_headers/1_bias.h"
 
-#include "param_headers/2_weight.h"
-#include "param_headers/2_bias.h"
+#include "../param_headers/2_weight.h"
+#include "../param_headers/2_bias.h"
 
-#include "param_headers/3_weight.h"
-#include "param_headers/3_bias.h"
+#include "../param_headers/3_weight.h"
+#include "../param_headers/3_bias.h"
 
-#include "param_headers/4_weight.h"
-#include "param_headers/4_bias.h"
+#include "../param_headers/4_weight.h"
+#include "../param_headers/4_bias.h"
 
-#include "param_headers/5_weight.h"
-#include "param_headers/5_bias.h"
+#include "../param_headers/5_weight.h"
+#include "../param_headers/5_bias.h"
 
-// #include "fc_include.h"
+//#include "../fc_include.h"
 
 /******* Layer Conv 1 ********/
 #define FILTER_HEIGHT_1    11
@@ -30,8 +30,7 @@
 #define OUT_CONV_WIDTH_1   55
 #define OUT_HEIGHT_1       27
 #define OUT_WIDTH_1        27
-// #define OUT_DEPTH_1        96
-#define OUT_DEPTH_1        2
+#define OUT_DEPTH_1        96
 #define STRIDE_CONV_1      4
 #define STRIDE_MAX_1       2
 #define POOL_SIZE_1        3
@@ -43,14 +42,12 @@
 #define FILTER_WIDTH_2    5
 #define IN_HEIGHT_2       31
 #define IN_WIDTH_2        31
-// #define IN_DEPTH_2        96
-#define IN_DEPTH_2        2
+#define IN_DEPTH_2        96
 #define OUT_CONV_HEIGHT_2 27
 #define OUT_CONV_WIDTH_2  27
 #define OUT_HEIGHT_2      13
 #define OUT_WIDTH_2       13
-// #define OUT_DEPTH_2       256
-#define OUT_DEPTH_2       4
+#define OUT_DEPTH_2       256
 #define STRIDE_CONV_2     1
 #define STRIDE_MAX_2      2
 #define POOL_SIZE_2       3
@@ -62,12 +59,10 @@
 #define FILTER_WIDTH_3  3
 #define IN_HEIGHT_3     15
 #define IN_WIDTH_3      15
-// #define IN_DEPTH_3      256
-#define IN_DEPTH_3      4
+#define IN_DEPTH_3      256
 #define OUT_HEIGHT_3    13
 #define OUT_WIDTH_3     13
-// #define OUT_DEPTH_3     384
-#define OUT_DEPTH_3     4
+#define OUT_DEPTH_3     384
 #define STRIDE_CONV_3   1
 /*****************************/
 
@@ -77,12 +72,10 @@
 #define FILTER_WIDTH_4  3
 #define IN_HEIGHT_4     15
 #define IN_WIDTH_4      15
-// #define IN_DEPTH_4      384
-#define IN_DEPTH_4      4
+#define IN_DEPTH_4      384
 #define OUT_HEIGHT_4    13
 #define OUT_WIDTH_4     13
-// #define OUT_DEPTH_4     384
-#define OUT_DEPTH_4     4
+#define OUT_DEPTH_4     384
 #define STRIDE_CONV_4   1
 /*****************************/
 
@@ -92,14 +85,12 @@
 #define FILTER_WIDTH_5    3
 #define IN_HEIGHT_5       15
 #define IN_WIDTH_5        15
-// #define IN_DEPTH_5        384
-#define IN_DEPTH_5        4
+#define IN_DEPTH_5        384
 #define OUT_CONV_HEIGHT_5 13
 #define OUT_CONV_WIDTH_5  13
 #define OUT_HEIGHT_5      6
 #define OUT_WIDTH_5       6
-// #define OUT_DEPTH_5       256
-#define OUT_DEPTH_5       4
+#define OUT_DEPTH_5       256
 #define STRIDE_MAX_5      2
 #define STRIDE_CONV_5     1
 #define POOL_SIZE_5       3
@@ -132,9 +123,6 @@
 #define OUT_DEPTH_8  1
 /*****************************/
 
-#define DEBUG_LAYER_CONV 1
-#define DEBUG_LAYER_MAX  1
-
 void conv(const float in[], const float weights[], const float bias[], float out[],
   const unsigned kh, const unsigned kw, const unsigned ih, const unsigned iw,
   const unsigned id, const unsigned oh, const unsigned ow, const unsigned od,
@@ -159,14 +147,6 @@ void conv(const float in[], const float weights[], const float bias[], float out
   unsigned ls = s * ih;
 
   unsigned print_i = 0;
-  FILE * debug_a;
-  FILE * debug_b;
-
-  // Debug files
-  if(layer == DEBUG_LAYER_CONV) {
-    debug_a = fopen("net_term_conv_a.txt","w");
-    debug_b = fopen("net_term_conv_b.txt","w");
-  }
 
   for ( o_s = 0; o_s < od; o_s++) {
     out_slice = &out[ o_s * oh * ow ];
@@ -183,37 +163,12 @@ void conv(const float in[], const float weights[], const float bias[], float out
           for ( f_y = 0; f_y < kh; f_y++) {
             for ( f_x = 0; f_x < kw; f_x++) {
               sum += f_el[f_x] * in_el[f_x];
-              if(layer == DEBUG_LAYER_CONV && o_s == 0 && i_s == 0 && o_x == 1 && o_y == 0){
-              // if(layer == DEBUG_LAYER_CONV && i_s == id-1 && o_s == od-1) {
-                printf(" [%2d] = %.6e * %.6e\n", print_i++, in_el[f_x], f_el[f_x]);
-                // printf("[%2d] = %.6e\n", print_i++, in_el[f_x]);
-              }
             }
-            // if(layer == DEBUG_LAYER_CONV && i_s == 0 && o_s == 48 && o_x == 0 && o_y == 0) {
-            //   printf("\n");
-            // }
             f_el += kw;
             in_el += iw;
           }
           o_line[o_x] += sum;
           in_line += s;
-          // if(o_s == 0 && i_s == 0 && o_x == 0 && o_y == 0 && od == OUT_DEPTH_2) {
-          // if(layer == DEBUG_LAYER_CONV && i_s == 0 && o_s == 0 && o_x == 24 && o_y == 26) {
-          if(layer == DEBUG_LAYER_CONV) {
-            if(layer == DEBUG_LAYER_CONV && o_s == 0 && i_s == 0 && o_x == 1 && o_y == 0)
-             printf("sum_%d [%d][%d][%d][%d] = %.6e + %.6e (%.6e)\n",layer,o_s,i_s,o_x,o_y, sum,bias[o_s],o_line[o_x]+bias[o_s]);
-            // printf("sum_%d = %.6e\n",layer,o_line[o_x]+bias[o_s]);
-            // print_i = 0;
-            if( o_s >= ( od/2 ) ) {
-             fprintf(debug_b, "sum_%d_b = %.6e\n", layer, o_line[o_x]+bias[o_s]);
-            } else {
-             fprintf(debug_a, "sum_%d_a = %.6e\n", layer, o_line[o_x]+bias[o_s]);
-            }
-          }
-          // if (layer == DEBUG_LAYER_CONV && i_s == 0 && o_s == 0 && o_x <= 1 && o_y <= 1) {
-          //   // printf("\n");
-          //   print_i = 0;
-          // }
         }
         o_line += ow;
         in_slice += ls;
@@ -222,15 +177,8 @@ void conv(const float in[], const float weights[], const float bias[], float out
 
     for(o_x = 0; o_x < oh*ow; o_x++) {
       out_slice[o_x] += bias[o_s];
-      // if(layer == DEBUG_LAYER_CONV && o_s == 0) printf("sum_%d = %f\n", layer, out_slice[o_x]);
     }
   }
-
-  if( layer == DEBUG_LAYER_CONV ){
-    fclose(debug_a);
-    fclose(debug_b);
-  }
-
 }
 
 void relu(float in[], const unsigned ih, const unsigned iw, const unsigned id) {
@@ -250,7 +198,6 @@ void softmax(float in[], float out [],
   unsigned size = ih * iw * id;
   unsigned i;
   float denominator = 0.0;
-
   float alpha = in[0];
   for( i=1; i < size; ++i) {
     if(in[i] > alpha)
@@ -348,16 +295,6 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
   unsigned in_idx, out_idx;
   float max;
 
-  unsigned i_print = 0;
-  FILE * debug_a;
-  FILE * debug_b;
-
-  // Debug files
-  if(layer == DEBUG_LAYER_MAX) {
-    debug_a = fopen("net_term_max_a.txt","w");
-    debug_b = fopen("net_term_max_b.txt","w");
-  }
-
   for( k = 0; k < od; ++k) {
     for( y_o = 0; y_o < oh; y_o++ ) {
       for( x_o = 0; x_o < ow; x_o++ ) {
@@ -365,10 +302,6 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
         for( wy = 0; wy < ps; wy++ ) {
           for( wx = 0; wx < ps; wx++ ) {
             in_idx = (ih*k + (y_o*stride+wy)) * iw + (x_o*stride+wx);
-            // if(layer == DEBUG_LAYER_MAX && k == 0 && x_o == 11 && y_o == 0) {
-            // // if(layer == DEBUG_LAYER_MAX) {
-            //   printf("in[%d] = %.6e\n", in_idx, in[in_idx]);
-            // }
             if(in[in_idx] > max) {
               max = in[in_idx];
             }
@@ -376,24 +309,8 @@ void maxpool(float in[], float out[], const unsigned ih, const unsigned iw,
         }
         out_idx = (oh*k + y_o) * ow + x_o;
         out[out_idx] = max;
-       // if(layer == DEBUG_LAYER_MAX && k == 0 && (x_o == 21||x_o == 20) && y_o == 13) {
-       if(layer == DEBUG_LAYER_MAX) {
-         // printf("max_%d [%2d][%2d][%2d] = %.6e\n", layer, k, x_o, y_o, max);
-         // printf("max_%d = %.6e\n", layer, max);
-         if( k >= ( od/2 ) ) {
-           fprintf(debug_b, "max_%d_b = %.6e\n", layer, max);
-         } else {
-           fprintf(debug_a, "max_%d_a = %.6e\n", layer, max);
-         }
-       }
-       i_print++;
       }
     }
-  }
-
-  if( layer == DEBUG_LAYER_MAX ){
-    fclose(debug_a);
-    fclose(debug_b);
   }
 
 }
@@ -419,21 +336,11 @@ int main(int argc, char** argv) {
 
   size_t alloc_size;
 
+  unsigned o_x;
+
   unsigned i;
-  // unsigned o_x;
-  // float error;
-  // float max;
 
-  // // PARA TESTES
-  // FILE * out_i = fopen("transfer_files/IN_DATA.dat","r");
-  // alloc_size = IN_HEIGHT_1*IN_WIDTH_1*IN_DEPTH_1;
-  // float * in_1 = malloc(alloc_size * sizeof(float));
-  // if (!in_1) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  // for (i=0; i < alloc_size; ++i){
-  //  fscanf(out_i, "%f", &(in_1[i]));
-  // }
-  // fclose(out_i);
-
+  printf("Starting Alexnet\n");
   /******************************** Layer 1 ***********************************/
   alloc_size = OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1;
   float * out_1 = malloc(alloc_size * sizeof(float));
@@ -443,18 +350,12 @@ int main(int argc, char** argv) {
     out_1[i] = 0.0;
   }
 
+  printf("CONV 1...\n");
   conv(in_1, weight_1, bias_1, out_1,
     FILTER_HEIGHT_1, FILTER_WIDTH_1,
     IN_HEIGHT_1, IN_WIDTH_1, IN_DEPTH_1,
     OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1,
     STRIDE_CONV_1, 1);
-
-  // free(in_1);
-
-  // FILE * out_f_w = fopen("transfer_files/NET_OUT.dat","w");
-  // for (o_x = 0; o_x < OUT_CONV_WIDTH_1*OUT_CONV_HEIGHT_1*OUT_DEPTH_1; o_x++) {
-  //   fprintf(out_f_w, "%f\n", out_1[o_x]);
-  // }
 
   relu(out_1, OUT_CONV_HEIGHT_1, OUT_CONV_WIDTH_1, OUT_DEPTH_1);
   //
@@ -494,6 +395,7 @@ int main(int argc, char** argv) {
     out_2[i] = 0.0;
   }
 
+  printf("CONV 2...\n");
   conv(in_2, weight_2, bias_2, out_2,
     FILTER_HEIGHT_2, FILTER_WIDTH_2,
     IN_HEIGHT_2, IN_WIDTH_2, IN_DEPTH_2,
@@ -541,6 +443,7 @@ int main(int argc, char** argv) {
     out_3[i] = 0.0;
   }
 
+  printf("CONV 3...\n");
   conv(in_3, weight_3, bias_3, out_3,
     FILTER_HEIGHT_3, FILTER_WIDTH_3,
     IN_HEIGHT_3, IN_WIDTH_3, IN_DEPTH_3,
@@ -568,6 +471,7 @@ int main(int argc, char** argv) {
     out_4[i] = 0.0;
   }
 
+  printf("CONV 4...\n");
   conv(in_4, weight_4, bias_4, out_4,
     FILTER_HEIGHT_4, FILTER_WIDTH_4,
     IN_HEIGHT_4, IN_WIDTH_4, IN_DEPTH_4,
@@ -595,6 +499,7 @@ int main(int argc, char** argv) {
     out_5[i] = 0.0;
   }
 
+  printf("CONV 5...\n");
   conv(in_5, weight_5, bias_5, out_5,
     FILTER_HEIGHT_5, FILTER_WIDTH_5,
     IN_HEIGHT_5, IN_WIDTH_5, IN_DEPTH_5,
@@ -613,55 +518,66 @@ int main(int argc, char** argv) {
           OUT_HEIGHT_5, OUT_WIDTH_5, OUT_DEPTH_5,
           STRIDE_MAX_5, POOL_SIZE_5, 5);
 
-  free(out_5);
+  // free(out_5);
 
   // /******************************** Layer 6 ***********************************/
   // alloc_size = OUT_HEIGHT_6*OUT_WIDTH_6*OUT_DEPTH_6;
   // float * out_6 = malloc(alloc_size * sizeof(float));
   // if (!out_6) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
+
+  // printf("FC 6...\n");
   // fc_6(out_pool_5, out_6);
-  //
-  free(out_pool_5);
-  //
+
+  // free(out_pool_5);
+
   // relu(out_6, OUT_HEIGHT_6, OUT_WIDTH_6, OUT_DEPTH_6);
-  //
+
   // /******************************** Layer 7 ***********************************/
   // alloc_size = OUT_HEIGHT_7*OUT_WIDTH_7*OUT_DEPTH_7;
   // float * out_7 = malloc(alloc_size * sizeof(float));
-  // if (!out_7) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
-  // fc_7(out_6, out_7);
-  //
-  // free(out_6);
-  //
-  // relu(out_7, OUT_HEIGHT_7, OUT_WIDTH_7, OUT_DEPTH_7);
-  // /******************************** Layer 8 ***********************************/
+//   if (!out_7) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+//   printf("FC 7...\n");
+//   fc_7(out_6, out_7);
+
+//   free(out_6);
+
+//   relu(out_7, OUT_HEIGHT_7, OUT_WIDTH_7, OUT_DEPTH_7);
+   /******************************** Layer 8 ***********************************/
+//   alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+//   float * out_8 = malloc(alloc_size * sizeof(float));
+//   if (!out_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+//   printf("FC 8...\n");
+//   fc_8(out_7, out_8);
+
+//   free(out_7);
+
+//   alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+//   float * soft_8 = malloc(alloc_size * sizeof(float));
+//   if (!soft_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
+
+//   softmax(out_8, soft_8, OUT_HEIGHT_8, OUT_WIDTH_8, OUT_DEPTH_8);
+
+//   free(out_8);
+
+  /****************************** Comparison **********************************/
+  FILE * out_f_w = fopen("NET_OUT.dat","w");
+  for (o_x = 0; o_x < OUT_HEIGHT_5*OUT_WIDTH_5*OUT_DEPTH_5; o_x++) {
+    fprintf(out_f_w, "%f\n", out_pool_5[o_x]);
+  }
+  fclose(out_f_w);
+
+  // FILE * out_f = fopen("transfer_files/OUT_DATA.dat","r");
+  // // FILE * out_f = fopen("transfer_files/IN_DATA.dat","r");
   // alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
-  // float * out_8 = malloc(alloc_size * sizeof(float));
-  // if (!out_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
-  // fc_8(out_7, out_8);
-  //
-  // free(out_7);
-  //
-  // alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
-  // float * soft_8 = malloc(alloc_size * sizeof(float));
-  // if (!soft_8) { perror("malloc failed"); exit(EXIT_FAILURE); };
-  //
-  // softmax(out_8, soft_8, OUT_HEIGHT_8, OUT_WIDTH_8, OUT_DEPTH_8);
-  //
-  // free(out_8);
-  //
-  // /****************************** Comparison **********************************/
-  //
-  // FILE * out_f = fopen("OUT_DATA_NO_ERROR.dat","w");
-  // alloc_size = OUT_HEIGHT_8*OUT_WIDTH_8*OUT_DEPTH_8;
+  // float * out_test = malloc(alloc_size * sizeof(float));
+  // if (!out_test) { perror("malloc failed"); exit(EXIT_FAILURE); };
   // for (i=0; i < alloc_size; ++i){
-  //  fprintf(out_f, "%f", soft_8[i]);
+  //  fscanf(out_f, "%f", &(out_test[i]));
   // }
   // fclose(out_f);
-
+  //
   // error = 0.0;
   // max = 0.0;
   // i = 0;

@@ -1,72 +1,167 @@
+IMPERAS_HOME := $(shell getpath.exe "$(IMPERAS_HOME)")
 
-#mini makefile pra facilitar...
+SRC = $(wildcard *.c)
 
-CXX = g++
-#CXX = arm-linux-gnueabi-gcc
+#ELF = fibonacci.ARM7-O0-g.elf fibonacci.ARM_CORTEX_A-O3-g.elf fibonacci.ARM9-O3-g.elf fibonacci.AARCH32-O3-g.elf fibonacci.AARCH64-O3-g.elf fibonacci.ARM_CORTEX_M0-O3-g.elf fibonacci.ARM_CORTEX_M3-O3-g.elf
+ELF = net_ovp.ARM7-O0-g.elf
+#ELF = net_ovp.ARM_CORTEX_A-O3-g.elf
+#ELF = net_ovp.AARCH64-O3-g.elf
 
-#CFLAGS = -std=gnu++11 -g -O3 -ftree-vectorize -funsafe-math-optimizations -DDNN_USE_IMAGE_API -I../../
-#CFLAGS = -O0 -march=armv8-a -ftree-vectorize -I../../
-#CFLAGS = -O0 -mcpu=cortex-a53
+# PROG=fibonacci
+# CROSS=ARM7
+# ELFROOT=ARM7-O0-g
+# ELF=fibonacci.ARM7-O0-g.elf
+# OPTIONS=-O0 -g
 
-#LDFLAGS = -lm
-LDFLAGS = -lm -static
+ARM7-O0-g_OBJ = $(foreach S,$(SRC),$(patsubst %.c,%.ARM7-O0-g.o,$(S)))
 
-src = test.cpp
+CROSS := ARM7
+-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/$(CROSS).makefile.include
+ifeq ($($(CROSS)_CC),)
+	IMPERAS_ERROR := $(error "Error : $(CROSS)_CC not set. Please check installation of toolchain for $(CROSS)")
+endif
 
-all: clean alexnet
+# PROG=fibonacci
+# CROSS=ARM_CORTEX_A
+# ELFROOT=ARM_CORTEX_A-O3-g
+# ELF=fibonacci.ARM_CORTEX_A-O3-g.elf
+# OPTIONS=-O3 -g
 
-alexnet:
-	$(CXX) $(CFLAGS) $(LDFLAGS) $(src) -o alexnet
+ARM_CORTEX_A-O3-g_OBJ = $(foreach S,$(SRC),$(patsubst %.c,%.ARM_CORTEX_A-O3-g.o,$(S)))
 
-.PHONY: clean
+CROSS := ARM_CORTEX_A
+-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/$(CROSS).makefile.include
+ifeq ($($(CROSS)_CC),)
+	IMPERAS_ERROR := $(error "Error : $(CROSS)_CC not set. Please check installation of toolchain for $(CROSS)")
+endif
 
-clean:
-	rm -f alexnet
+# PROG=fibonacci
+# CROSS=ARM9
+# ELFROOT=ARM9-O3-g
+# ELF=fibonacci.ARM9-O3-g.elf
+# OPTIONS=-O3 -g
 
-.PHONY: run
+#ARM9-O3-g_OBJ = $(foreach S,$(SRC),$(patsubst %.c,%.ARM9-O3-g.o,$(S)))
 
-run:
-	./alexnet tiny-model-alexnet classes.txt imagens/slippers.jpg
+#CROSS := ARM9
+#-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/$(CROSS).makefile.include
+#ifeq ($($(CROSS)_CC),)
+#	IMPERAS_ERROR := $(error "Error : $(CROSS)_CC not set. Please check installation of toolchain for $(CROSS)")
+#endif
 
-.PHONY: conv_sample
+# PROG=fibonacci
+# CROSS=AARCH32
+# ELFROOT=AARCH32-O3-g
+# ELF=fibonacci.AARCH32-O3-g.elf
+# OPTIONS=-O3 -g
 
-conv_sample:
-	rm -f conv_sample
-	gcc -Wall conv_sample.c -o conv_sample -lm
+AARCH32-O3-g_OBJ = $(foreach S,$(SRC),$(patsubst %.c,%.AARCH32-O3-g.o,$(S)))
 
-.PHONY: fc_sample
+CROSS := AARCH32
+-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/$(CROSS).makefile.include
+ifeq ($($(CROSS)_CC),)
+	IMPERAS_ERROR := $(error "Error : $(CROSS)_CC not set. Please check installation of toolchain for $(CROSS)")
+endif
 
-fc_sample:
-	rm -f fc_sample
-	gcc -Wall fc_sample.c -o fc_sample -lm
+# PROG=fibonacci
+# CROSS=AARCH64
+# ELFROOT=AARCH64-O3-g
+# ELF=fibonacci.AARCH64-O3-g.elf
+# OPTIONS=-O3 -g
 
-.PHONY: net
+#AARCH64-O3-g_OBJ = $(foreach S,$(SRC),$(patsubst %.c,%.AARCH64-O3-g.o,$(S)))
 
-net:
-	rm -f net
-	gcc -O0 net_ovp.c fc_6.c fc_7.c fc_8.c -o net -lm
-	#$(CXX) $(CFLAGS) net_ovp.c fc_6.c fc_7.c fc_8.c -o net $(LDFLAGS)
-	#gcc -Wall net.c -o net -lm
-	#gcc net.c fc_6.c fc_7.c fc_8.c -o net -lm
-	# gcc net.c fc_6.c -o net -lm
+CROSS := AARCH64
+-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/$(CROSS).makefile.include
+ifeq ($($(CROSS)_CC),)
+	IMPERAS_ERROR := $(error "Error : $(CROSS)_CC not set. Please check installation of toolchain for $(CROSS)")
+endif
 
+# PROG=fibonacci
+# CROSS=ARM_CORTEX_M0
+# ELFROOT=ARM_CORTEX_M0-O3-g
+# ELF=fibonacci.ARM_CORTEX_M0-O3-g.elf
+# OPTIONS=-O3 -g
 
-# NOTE
-#
-# Linha para gerar graficos do massif:
-# $ valgrind --tool=massif --pages-as-heap=yes --heap=yes ./fc_sample
-#
-# Linha para gerar .h include files de parametros da rede
-# $ ./write_array.py 227 227 3 in_1 transfer_files/IN_DATA.dat param_headers/1_in.h
-# $ ./write_array.py 121 3 96 weight_1 transfer_files/FILTER_DATA.dat param_headers/1_weight.h
-# $ ./write_array.py 1 1 96 bias_1 transfer_files/BIAS_DATA.dat param_headers/1_bias.h
-#
-# Linha para gerar multiplos .h a partir de um arq texto com pesos
-# $ ./write_weights_n_files.py 6 6 256 4096 weights_6 transfer_files/FILTER_DATA.dat param_headers/weights_6/weights_6
-# $ ./write_weights_n_files.py 1 1 4096 4096 weights_7 transfer_files/FILTER_DATA.dat param_headers/weights_7/weights_7
-# $ ./write_weights_n_files.py 1 1 4096 1000 weights_8 transfer_files/FILTER_DATA.dat param_headers/weights_8/weights_8
-#
-# Linha para gerar histograma a partir do header de pesos
-# $ ./histogram.py 6 6 256 4096 param_headers/6_weight.h
-# $ ./histogram.py 1 1 4096 4096 param_headers/7_weight.h
-# $ ./histogram.py 1 1 4096 1000 param_headers/8_weight.h
+ARM_CORTEX_M0-O3-g_OBJ = $(foreach S,$(SRC),$(patsubst %.c,%.ARM_CORTEX_M0-O3-g.o,$(S)))
+
+CROSS := ARM_CORTEX_M0
+-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/$(CROSS).makefile.include
+ifeq ($($(CROSS)_CC),)
+	IMPERAS_ERROR := $(error "Error : $(CROSS)_CC not set. Please check installation of toolchain for $(CROSS)")
+endif
+
+# PROG=fibonacci
+# CROSS=ARM_CORTEX_M3
+# ELFROOT=ARM_CORTEX_M3-O3-g
+# ELF=fibonacci.ARM_CORTEX_M3-O3-g.elf
+# OPTIONS=-O3 -g
+
+ARM_CORTEX_M3-O3-g_OBJ = $(foreach S,$(SRC),$(patsubst %.c,%.ARM_CORTEX_M3-O3-g.o,$(S)))
+
+CROSS := ARM_CORTEX_M3
+-include $(IMPERAS_HOME)/lib/$(IMPERAS_ARCH)/CrossCompiler/$(CROSS).makefile.include
+ifeq ($($(CROSS)_CC),)
+	IMPERAS_ERROR := $(error "Error : $(CROSS)_CC not set. Please check installation of toolchain for $(CROSS)")
+endif
+
+all: $(ELF)
+
+%.ARM7-O0-g.elf:  $(ARM7-O0-g_OBJ)
+	@    echo "# Linking ARM7 $@"
+	$(V) $(ARM7_LINK) -o $@ $^ $(ARM7_LDFLAGS) -lm
+
+%.ARM7-O0-g.o: %.c
+	@    echo "# Compiling ARM7 $<"
+	$(V) $(ARM7_CC) --param ggc-min-expand=1 --param ggc-min-heapsize=1024000 -c -o $@ $< -DARM7 $(DEF) -O0 -g 
+
+%.ARM_CORTEX_A-O3-g.elf:  $(ARM_CORTEX_A-O3-g_OBJ)
+	@    echo "# Linking ARM_CORTEX_A $@"
+	$(V) $(ARM_CORTEX_A_LINK) -o $@ $^ $(ARM_CORTEX_A_LDFLAGS) -lm
+
+%.ARM_CORTEX_A-O3-g.o: %.c
+	@    echo "# Compiling ARM_CORTEX_A $<"
+	$(V) $(ARM_CORTEX_A_CC) -c -o $@ $< -DARM_CORTEX_A $(DEF) -O3 -g
+
+%.ARM9-O3-g.elf:  $(ARM9-O3-g_OBJ)
+	@    echo "# Linking ARM9 $@"
+	$(V) $(ARM9_LINK) -o $@ $^ $(ARM9_LDFLAGS) -lm
+
+%.ARM9-O3-g.o: %.c
+	@    echo "# Compiling ARM9 $<"
+	$(V) $(ARM9_CC) -c -o $@ $< -DARM9 $(DEF) -O3 -g
+
+%.AARCH32-O3-g.elf:  $(AARCH32-O3-g_OBJ)
+	@    echo "# Linking AARCH32 $@"
+	$(V) $(AARCH32_LINK) -o $@ $^ $(AARCH32_LDFLAGS) -lm
+
+%.AARCH32-O3-g.o: %.c
+	@    echo "# Compiling AARCH32 $<"
+	$(V) $(AARCH32_CC) -c -o $@ $< -DAARCH32 $(DEF) -O3 -g
+
+%.AARCH64-O3-g.elf:  $(AARCH64-O3-g_OBJ)
+	@    echo "# Linking AARCH64 $@"
+	$(V) $(AARCH64_LINK) -o $@ $^ $(AARCH64_LDFLAGS) -lm
+
+%.AARCH64-O3-g.o: %.c
+	@    echo "# Compiling AARCH64 $<"
+	$(V) $(AARCH64_CC) -c -o $@ $< -DAARCH64 $(DEF) -O3 -g
+
+%.ARM_CORTEX_M0-O3-g.elf:  $(ARM_CORTEX_M0-O3-g_OBJ)
+	@    echo "# Linking ARM_CORTEX_M0 $@"
+	$(V) $(ARM_CORTEX_M0_LINK) -o $@ $^ $(ARM_CORTEX_M0_LDFLAGS) -lm
+
+%.ARM_CORTEX_M0-O3-g.o: %.c
+	@    echo "# Compiling ARM_CORTEX_M0 $<"
+	$(V) $(ARM_CORTEX_M0_CC) -c -o $@ $< -DARM_CORTEX_M0 $(DEF) -O3 -g
+
+%.ARM_CORTEX_M3-O3-g.elf:  $(ARM_CORTEX_M3-O3-g_OBJ)
+	@    echo "# Linking ARM_CORTEX_M3 $@"
+	$(V) $(ARM_CORTEX_M3_LINK) -o $@ $^ $(ARM_CORTEX_M3_LDFLAGS) -lm
+
+%.ARM_CORTEX_M3-O3-g.o: %.c
+	@    echo "# Compiling ARM_CORTEX_M3 $<"
+	$(V) $(ARM_CORTEX_M3_CC) -c -o $@ $< -DARM_CORTEX_M3 $(DEF) -O3 -g
+
+clean::
+	- rm -f $(ELF)

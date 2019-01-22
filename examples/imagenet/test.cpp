@@ -57,6 +57,17 @@ void recognize(const std::string &model_name,
   vec_t data;
   convert_image(src_filename, 227, 227, data);
 
+  // Escreve imagem pre processada em um arquivo
+  std::ofstream f_preproc;
+  std::stringstream f_name;
+  f_name << "preproc_images/" << src_filename;
+  cout << "Preproc file: " << f_name.str() << endl;
+  f_preproc.open(f_name.str(), std::ios::out | std::ios::trunc);
+  for( int i=0; i < 227*227*3; i++) {
+   f_preproc << std::fixed << data[i] << endl;
+  }
+  f_preproc.close();
+
   // recognize
   // Korol
   #ifdef PRINT_DEBUG

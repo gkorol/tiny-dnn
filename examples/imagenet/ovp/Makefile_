@@ -2,13 +2,14 @@
 #mini makefile pra facilitar...
 
 CXX = g++
-# CXX = arm-linux-gnueabi-g++
+#CXX = arm-linux-gnueabi-gcc
 
-CFLAGS = -std=gnu++11 -g -O3 -ftree-vectorize -funsafe-math-optimizations -DDNN_USE_IMAGE_API -I../../
-# CFLAGS = -std=gnu++14 -g -O1 -march=armv8-a -ftree-vectorize -funsafe-math-optimizations -DDNN_USE_IMAGE_API -I../../
+#CFLAGS = -std=gnu++11 -g -O3 -ftree-vectorize -funsafe-math-optimizations -DDNN_USE_IMAGE_API -I../../
+#CFLAGS = -O0 -march=armv8-a -ftree-vectorize -I../../
+#CFLAGS = -O0 -mcpu=cortex-a53
 
-LDFLAGS = -lm
-# LDFLAGS = -lm -static
+#LDFLAGS = -lm
+LDFLAGS = -lm -static
 
 src = test.cpp
 
@@ -43,8 +44,11 @@ fc_sample:
 
 net:
 	rm -f net
-	gcc -Wall -pg net.c -o net -lm
+	gcc -O0 net_ovp.c fc_6.c fc_7.c fc_8.c -o net -lm
+	#$(CXX) $(CFLAGS) net_ovp.c fc_6.c fc_7.c fc_8.c -o net $(LDFLAGS)
+	#gcc -Wall net.c -o net -lm
 	#gcc net.c fc_6.c fc_7.c fc_8.c -o net -lm
+	# gcc net.c fc_6.c -o net -lm
 
 
 # NOTE
